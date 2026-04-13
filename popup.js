@@ -33,6 +33,29 @@ document.getElementById('autoTranslate').addEventListener('change', (e) => {
   updateAutoTranslateWarning(e.target.checked);
 });
 
+// ========== 使用状況 ==========
+
+function formatNumber(n) {
+  if (n >= 1_000_000) return (n / 1_000_000).toFixed(1) + 'M';
+  if (n >= 1_000) return (n / 1_000).toFixed(1) + 'K';
+  return String(n);
+}
+
+function loadStats() {
+  chrome.storage.local.get('stats', ({ stats = {} }) => {
+    document.getElementById('statsRequests').textContent  = formatNumber(stats.requests         || 0);
+    document.getElementById('statsPrompt').textContent    = formatNumber(stats.promptTokens     || 0);
+    document.getElementById('statsCompletion').textContent = formatNumber(stats.completionTokens || 0);
+  });
+}
+
+loadStats();
+
+document.getElementById('statsResetBtn').addEventListener('click', () => {
+  if (!confirm('使用状況をリセットしますか？')) return;
+  chrome.storage.local.set({ stats: { requests: 0, promptTokens: 0, completionTokens: 0 } }, loadStats);
+});
+
 // 保存
 document.getElementById('saveBtn').addEventListener('click', () => {
   const baseUrl    = document.getElementById('baseUrl').value.trim();

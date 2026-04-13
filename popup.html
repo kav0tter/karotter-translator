@@ -113,6 +113,59 @@
     .save-btn:hover { background: var(--accent-dark); }
     .save-btn:active { filter: brightness(0.9); }
 
+    .stats-card {
+      background: var(--surface-soft);
+      border: 1px solid var(--border-soft);
+      border-radius: 8px;
+      padding: 10px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .stats-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .stats-title {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .stats-reset-btn {
+      font-size: 11px;
+      color: var(--text-muted);
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 0;
+      text-decoration: underline;
+      text-underline-offset: 2px;
+    }
+    .stats-reset-btn:hover { color: #dc2626; }
+    .stats-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 4px;
+    }
+    .stats-item {
+      display: flex;
+      flex-direction: column;
+      gap: 1px;
+    }
+    .stats-value {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text-primary);
+      line-height: 1.2;
+    }
+    .stats-label {
+      font-size: 10px;
+      color: var(--text-muted);
+    }
+
     .status {
       font-size: 12px;
       text-align: center;
@@ -279,6 +332,27 @@
       <input type="checkbox" id="debugMode" />
       <span class="toggle-track"><span class="toggle-thumb"></span></span>
     </label>
+
+    <div class="stats-card">
+      <div class="stats-header">
+        <span class="stats-title">使用状況</span>
+        <button class="stats-reset-btn" id="statsResetBtn">リセット</button>
+      </div>
+      <div class="stats-grid">
+        <div class="stats-item">
+          <span class="stats-value" id="statsRequests">—</span>
+          <span class="stats-label">リクエスト数</span>
+        </div>
+        <div class="stats-item">
+          <span class="stats-value" id="statsPrompt">—</span>
+          <span class="stats-label">入力トークン</span>
+        </div>
+        <div class="stats-item">
+          <span class="stats-value" id="statsCompletion">—</span>
+          <span class="stats-label">出力トークン</span>
+        </div>
+      </div>
+    </div>
 
     <button class="save-btn" id="saveBtn">
       <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">

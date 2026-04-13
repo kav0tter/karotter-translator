@@ -108,9 +108,23 @@ ${text}`;
     throw new Error('APIレスポンスの形式が不正です');
   }
 
+  // トークン使用量を累積保存
+  const usage = data.usage;
+  if (usage) {
+    const { stats = {} } = await chrome.storage.local.get('stats');
+    await chrome.storage.local.set({
+      stats: {
+        promptTokens:     (stats.promptTokens     || 0) + (usage.prompt_tokens     || 0),
+        completionTokens: (stats.completionTokens || 0) + (usage.completion_tokens || 0),
+        requests:         (stats.requests         || 0) + 1,
+      },
+    });
+  }
+
   if (debug) {
     console.log('[KT] APIレスポンス ─────────────────');
     console.log('[KT]', parsed);
+    if (usage) console.log('[KT] usage:', usage);
   }
 
   return parsed;
