@@ -27,6 +27,7 @@ const autoTranslateQueue = [];
 let autoTranslateProcessing = false;
 
 function enqueueAutoTranslate(btn) {
+  btn.dataset.ktAuto = '1'; // 自動翻訳起点であることを記録
   autoTranslateQueue.push(btn);
   if (!autoTranslateProcessing) processAutoTranslateQueue();
 }
@@ -245,7 +246,7 @@ function injectTranslateButton(reactionBtn) {
       const { translated_text, is_same_language, source_language, target_language } = result;
 
       if (is_same_language) {
-        showToast('同じ言語のため翻訳をスキップしました');
+        if (!btn.dataset.ktAuto) showToast('同じ言語のため翻訳をスキップしました');
         btn.querySelector('.kt-btn-label').textContent = '翻訳';
         btn.disabled = false;
         return;
