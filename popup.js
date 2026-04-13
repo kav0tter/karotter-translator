@@ -10,7 +10,7 @@ document.getElementById('appHeader').addEventListener('click', () => {
   }
 });
 
-const KEYS = ['baseUrl', 'apiKey', 'model', 'language', 'maxContext', 'debugMode'];
+const KEYS = ['baseUrl', 'apiKey', 'model', 'language', 'maxContext', 'autoTranslate', 'debugMode'];
 
 // 設定を読み込んでフォームに反映
 chrome.storage.sync.get(KEYS, (data) => {
@@ -18,8 +18,19 @@ chrome.storage.sync.get(KEYS, (data) => {
   document.getElementById('apiKey').value     = data.apiKey     || '';
   document.getElementById('model').value      = data.model      || 'gpt-4o-mini';
   document.getElementById('language').value   = data.language   || '日本語';
-  document.getElementById('maxContext').value    = data.maxContext ?? 0;
-  document.getElementById('debugMode').checked  = data.debugMode  ?? false;
+  document.getElementById('maxContext').value      = data.maxContext    ?? 0;
+  const autoTranslateEl = document.getElementById('autoTranslate');
+  autoTranslateEl.checked = data.autoTranslate ?? false;
+  updateAutoTranslateWarning(autoTranslateEl.checked);
+  document.getElementById('debugMode').checked     = data.debugMode     ?? false;
+});
+
+function updateAutoTranslateWarning(checked) {
+  document.getElementById('autoTranslateWarning').classList.toggle('visible', checked);
+}
+
+document.getElementById('autoTranslate').addEventListener('change', (e) => {
+  updateAutoTranslateWarning(e.target.checked);
 });
 
 // 保存
@@ -28,8 +39,9 @@ document.getElementById('saveBtn').addEventListener('click', () => {
   const apiKey     = document.getElementById('apiKey').value.trim();
   const model      = document.getElementById('model').value.trim() || 'gpt-4o-mini';
   const language   = document.getElementById('language').value;
-  const maxContext = parseInt(document.getElementById('maxContext').value) || 0;
-  const debugMode  = document.getElementById('debugMode').checked;
+  const maxContext    = parseInt(document.getElementById('maxContext').value) || 0;
+  const autoTranslate = document.getElementById('autoTranslate').checked;
+  const debugMode     = document.getElementById('debugMode').checked;
 
   const statusEl = document.getElementById('status');
 
@@ -39,7 +51,7 @@ document.getElementById('saveBtn').addEventListener('click', () => {
     return;
   }
 
-  chrome.storage.sync.set({ baseUrl, apiKey, model, language, maxContext, debugMode }, () => {
+  chrome.storage.sync.set({ baseUrl, apiKey, model, language, maxContext, autoTranslate, debugMode }, () => {
     statusEl.textContent = '設定を保存しました';
     statusEl.className = 'status success';
     setTimeout(() => { statusEl.className = 'status'; }, 2000);

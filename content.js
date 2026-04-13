@@ -5,6 +5,54 @@ const PROCESSED_ATTR = 'data-kt-translated';
 // 翻訳キャッシュ（オリジナルテキスト → 翻訳結果）
 const translationCache = new Map();
 
+// ========== 自動翻訳モード ==========
+
+let autoTranslateEnabled = false;
+
+(async () => {
+  try {
+    const { autoTranslate } = await chrome.storage.sync.get(['autoTranslate']);
+    autoTranslateEnabled = autoTranslate ?? false;
+  } catch { /* 拡張機能コンテキスト未準備 */ }
+})();
+
+try {
+  chrome.storage.onChanged.addListener((changes) => {
+    if ('autoTranslate' in changes) autoTranslateEnabled = changes.autoTranslate.newValue;
+  });
+} catch { /* ignore */ }
+
+// 自動翻訳キュー（APIへの同時リクエストを1件ずつに制限）
+const autoTranslateQueue = [];
+let autoTranslateProcessing = false;
+
+function enqueueAutoTranslate(btn) {
+  autoTranslateQueue.push(btn);
+  if (!autoTranslateProcessing) processAutoTranslateQueue();
+}
+
+function processAutoTranslateQueue() {
+  const btn = autoTranslateQueue.shift();
+  if (!btn) { autoTranslateProcessing = false; return; }
+  autoTranslateProcessing = true;
+
+  // DOM から消えていたり既翻訳なら次へ
+  if (!document.body.contains(btn) || btn.classList.contains('kt-translated')) {
+    processAutoTranslateQueue();
+    return;
+  }
+
+  btn.click();
+
+  // disabled が解除されるまで待って次をキック
+  const poll = setInterval(() => {
+    if (!btn.disabled) {
+      clearInterval(poll);
+      setTimeout(processAutoTranslateQueue, 300);
+    }
+  }, 100);
+}
+
 // ========== 投稿コンテナの特定 ==========
 // [aria-label="リアクションを追加"] ボタンを基点にする（ページ種別を問わず安定）
 
@@ -128,6 +176,9 @@ function injectTranslateButton(reactionBtn) {
   btnRow.appendChild(btn);
   // textElの直後に挿入（画像・メディアより前になる）
   textEl.insertAdjacentElement('beforebegin', btnRow);
+
+  // 自動翻訳モードが有効なら翻訳をキューに積む
+  if (autoTranslateEnabled) enqueueAutoTranslate(btn);
 
   let originalText = null;
   let isTranslated = false;
