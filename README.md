@@ -1,5 +1,11 @@
 # Karotter Translator
 
+![version](https://img.shields.io/badge/version-1.0.0-blue?style=flat-square)
+![manifest](https://img.shields.io/badge/manifest-v3-brightgreen?style=flat-square)
+![license](https://img.shields.io/github/license/kav0tter/karotter-translator?style=flat-square)
+![platform](https://img.shields.io/badge/platform-Chrome-yellow?style=flat-square&logo=googlechrome&logoColor=white)
+![karotter studio](https://img.shields.io/badge/karotter_studio-compatible-blueviolet?style=flat-square)
+
 **[karotter.com](https://karotter.com) をそのまま多言語で読み書きするChrome拡張。**
 
 好きなLLM・好きな言語で、タイムラインの閲覧から返信の下書きまで。言語の壁をカロートから取り除きます。
