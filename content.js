@@ -267,6 +267,51 @@ function injectTranslateButton(reactionBtn) {
   });
 }
 
+// ========== 最近使用した翻訳先言語の管理 ==========
+
+const MAX_RECENT_LANGS = 3;
+
+async function getRecentLanguages() {
+  try {
+    const { recentLanguages } = await chrome.storage.local.get(['recentLanguages']);
+    return recentLanguages || [];
+  } catch { return []; }
+}
+
+async function saveRecentLanguage(lang) {
+  try {
+    const recent = await getRecentLanguages();
+    const updated = [lang, ...recent.filter(l => l !== lang)].slice(0, MAX_RECENT_LANGS);
+    await chrome.storage.local.set({ recentLanguages: updated });
+  } catch { /* ignore */ }
+}
+
+function buildLangOptions(langSelect, allLanguages, recentLanguages, selectedLang) {
+  langSelect.innerHTML = '';
+
+  if (recentLanguages.length > 0) {
+    recentLanguages.forEach(lang => {
+      const opt = document.createElement('option');
+      opt.value = lang;
+      opt.textContent = lang;
+      langSelect.appendChild(opt);
+    });
+    const sep = document.createElement('option');
+    sep.disabled = true;
+    sep.textContent = '──────────';
+    langSelect.appendChild(sep);
+  }
+
+  allLanguages.forEach(lang => {
+    const opt = document.createElement('option');
+    opt.value = lang;
+    opt.textContent = lang;
+    langSelect.appendChild(opt);
+  });
+
+  langSelect.value = selectedLang;
+}
+
 // ========== 投稿・返信画面の翻訳ボタン ==========
 
 const COMPOSE_SUBMIT_LABELS = ['カロート', '返信', '引用カロート'];
@@ -299,17 +344,16 @@ function injectComposeTranslateButton(root) {
   langSelect.className = 'kt-lang-select';
   langSelect.title = '翻訳先言語';
 
-  LANGUAGES.forEach(lang => {
-    const opt = document.createElement('option');
-    opt.value = lang;
-    opt.textContent = lang;
-    langSelect.appendChild(opt);
-  });
-
-  getStorage(['language']).then(({ language }) => {
-    const defaultLang = language === '英語' ? '日本語' : '英語';
-    langSelect.value = LANGUAGES.includes(defaultLang) ? defaultLang : LANGUAGES[0];
-  });
+  // 最近使用した言語 + 設定デフォルトを非同期で反映
+  (async () => {
+    const [{ language }, recent] = await Promise.all([
+      getStorage(['language']),
+      getRecentLanguages(),
+    ]);
+    const fallback = language === '英語' ? '日本語' : '英語';
+    const selectedLang = recent[0] ?? (LANGUAGES.includes(fallback) ? fallback : LANGUAGES[0]);
+    buildLangOptions(langSelect, LANGUAGES, recent, selectedLang);
+  })();
 
   const translateBtn = document.createElement('button');
   translateBtn.type = 'button';
@@ -393,6 +437,13 @@ function injectComposeTranslateButton(root) {
       setNativeValue(textarea, translated_text);
       translateBtn.textContent = '元に戻す';
       translateBtn.classList.add('kt-translated');
+
+      // 使用した言語を履歴に保存しセレクトを再構築
+      const usedLang = langSelect.value;
+      saveRecentLanguage(usedLang).then(async () => {
+        const recent = await getRecentLanguages();
+        buildLangOptions(langSelect, LANGUAGES, recent, usedLang);
+      });
     } catch (err) {
       showToast(`翻訳エラー: ${err.message}`, 'error');
       translateBtn.innerHTML = btnInner();
