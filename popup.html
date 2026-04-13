@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Karotter Translator 設定</title>
+  <style>
+    :root {
+      --accent:       #2563eb;
+      --accent-dark:  #1d4ed8;
+      --accent-soft:  rgba(37, 99, 235, .12);
+      --app-bg:       #eef3f8;
+      --surface-card: #ffffff;
+      --surface-soft: #eef4fa;
+      --text-primary:   #102132;
+      --text-secondary: #38516a;
+      --text-muted:     #667b93;
+      --border-soft:  rgba(152, 168, 187, .28);
+      --neutral-200:  #dce6ef;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --app-bg:       #0f1923;
+        --surface-card: #1a2736;
+        --surface-soft: #1f2f3f;
+        --text-primary:   #e8f0f8;
+        --text-secondary: #9db8d0;
+        --text-muted:     #6b8aa0;
+        --border-soft:  rgba(100, 140, 170, .2);
+        --neutral-200:  #2a3f52;
+      }
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      font-size: 14px;
+      color: var(--text-primary);
+      background: var(--app-bg);
+      width: 100%;
+      min-height: 100vh;
+    }
+
+    header {
+      background: var(--accent);
+      color: #fff;
+      padding: 14px 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    header svg { flex-shrink: 0; }
+
+    header h1 {
+      font-size: 15px;
+      font-weight: 600;
+      letter-spacing: 0.01em;
+    }
+
+    main { padding: 16px; display: flex; flex-direction: column; gap: 14px; }
+
+    .field { display: flex; flex-direction: column; gap: 5px; }
+
+    label {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    input, select {
+      padding: 8px 10px;
+      border: 1px solid var(--border-soft);
+      border-radius: 6px;
+      font-size: 13px;
+      color: var(--text-primary);
+      background: var(--surface-card);
+      outline: none;
+      transition: border-color 0.15s;
+      width: 100%;
+    }
+
+    input:focus, select:focus { border-color: var(--accent); }
+
+    .hint {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    .save-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      width: 100%;
+      padding: 10px;
+      border-radius: 8px;
+      border: none;
+      background: var(--accent);
+      color: #fff;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background-color 0.15s;
+      margin-top: 2px;
+    }
+
+    .save-btn:hover { background: var(--accent-dark); }
+    .save-btn:active { filter: brightness(0.9); }
+
+    .status {
+      font-size: 12px;
+      text-align: center;
+      padding: 6px;
+      border-radius: 6px;
+      display: none;
+    }
+
+    .status.success { background: var(--accent-soft); color: var(--accent-dark); display: block; }
+    .status.error   { background: #fee2e2; color: #991b1b; display: block; }
+
+    .toggle-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      cursor: pointer;
+      user-select: none;
+    }
+    .toggle-label { font-size: 13px; color: var(--text-secondary); }
+    .toggle-row input { display: none; }
+    .toggle-track {
+      position: relative;
+      width: 36px; height: 20px;
+      background: var(--neutral-200);
+      border-radius: 9999px;
+      transition: background 0.2s;
+      flex-shrink: 0;
+    }
+    .toggle-thumb {
+      position: absolute;
+      top: 2px; left: 2px;
+      width: 16px; height: 16px;
+      background: #fff;
+      border-radius: 50%;
+      transition: transform 0.2s;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+    }
+    .toggle-row input:checked ~ .toggle-track { background: var(--accent); }
+    .toggle-row input:checked ~ .toggle-track .toggle-thumb { transform: translateX(16px); }
+
+    .divider {
+      border: none;
+      border-top: 1px solid var(--border-soft);
+    }
+
+    .model-field { display: flex; flex-direction: column; gap: 5px; }
+
+    .credit {
+      font-size: 11px;
+      color: var(--text-muted);
+      text-align: center;
+      margin-top: 4px;
+    }
+    .credit a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+    .credit a:hover { text-decoration: underline; }
+
+    #debugRow { display: none; }
+    #debugRow.visible { display: flex; }
+  </style>
+</head>
+<body>
+  <header id="appHeader" style="cursor:default">
+    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="m5 8 6 6"/><path d="m4 14 6-6 2-3"/><path d="M2 5h12"/><path d="M7 2h1"/>
+      <path d="m22 22-5-10-5 10"/><path d="M14 18h6"/>
+    </svg>
+    <h1>Karotter Translator</h1>
+  </header>
+
+  <main>
+    <div class="field">
+      <label for="baseUrl">Base URL</label>
+      <input type="url" id="baseUrl" placeholder="https://api.openai.com/v1" />
+      <span class="hint">OpenAI互換APIのエンドポイント</span>
+    </div>
+
+    <div class="field">
+      <label for="apiKey">API Key</label>
+      <input type="password" id="apiKey" placeholder="sk-..." />
+    </div>
+
+    <div class="model-field">
+      <label for="model">モデル</label>
+      <input type="text" id="model" placeholder="gpt-4o-mini" />
+      <span class="hint">使用するモデルID（例: gpt-4o, gemma-3-27b-it）</span>
+    </div>
+
+    <hr class="divider" />
+
+    <div class="field">
+      <label for="maxContext">スレッドコンテキスト取得数</label>
+      <input type="number" id="maxContext" min="0" placeholder="0" />
+      <span class="hint">返信翻訳時に遡る投稿数（0 = 無制限）</span>
+    </div>
+
+    <div class="field">
+      <label for="language">翻訳先デフォルト言語</label>
+      <select id="language">
+        <option value="日本語">日本語</option>
+        <option value="英語">英語</option>
+        <option value="中国語（簡体字）">中国語（簡体字）</option>
+        <option value="中国語（繁体字）">中国語（繁体字）</option>
+        <option value="韓国語">韓国語</option>
+        <option value="フランス語">フランス語</option>
+        <option value="スペイン語">スペイン語</option>
+        <option value="ドイツ語">ドイツ語</option>
+        <option value="イタリア語">イタリア語</option>
+        <option value="ポルトガル語">ポルトガル語</option>
+        <option value="ロシア語">ロシア語</option>
+        <option value="アラビア語">アラビア語</option>
+        <option value="タイ語">タイ語</option>
+        <option value="ベトナム語">ベトナム語</option>
+        <option value="インドネシア語">インドネシア語</option>
+      </select>
+      <span class="hint">投稿一覧の「翻訳」ボタンで使う言語</span>
+    </div>
+
+    <hr class="divider" id="debugDivider" style="display:none" />
+
+    <label class="toggle-row" id="debugRow">
+      <span class="toggle-label">デバッグモード</span>
+      <input type="checkbox" id="debugMode" />
+      <span class="toggle-track"><span class="toggle-thumb"></span></span>
+    </label>
+
+    <button class="save-btn" id="saveBtn">
+      <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/>
+        <polyline points="17 21 17 13 7 13 7 21"/>
+        <polyline points="7 3 7 8 15 8"/>
+      </svg>
+      設定を保存
+    </button>
+
+    <div class="status" id="status"></div>
+
+    <p class="credit">developed by <a href="https://karotter.com/profile/v0" target="_blank">@v0</a></p>
+  </main>
+
+  <script src="popup.js"></script>
+</body>
+</html>

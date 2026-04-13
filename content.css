@@ -1,0 +1,129 @@
+/* Karotter Translator - content.css */
+
+/* ===== 翻訳ボタン行（テキストとアクションバーの間） ===== */
+
+.kt-translate-btn-row {
+  margin-top: 2px;
+  margin-bottom: 2px;
+}
+
+.kt-translate-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 0;
+  border: none;
+  background: transparent;
+  color: var(--text-muted, #667b93);
+  font-size: 12px;
+  cursor: pointer;
+  transition: color 0.15s;
+  line-height: 1;
+}
+
+.kt-translate-btn:hover:not(:disabled) {
+  color: var(--text-secondary, #38516a);
+}
+
+.kt-translate-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.kt-translate-btn svg {
+  flex-shrink: 0;
+}
+
+.kt-translate-btn.kt-translated {
+  color: var(--accent, #1d9bf0);
+}
+
+/* ===== 投稿画面の翻訳UI ===== */
+
+.kt-compose-translate {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-right: 6px;
+}
+
+.kt-lang-select {
+  padding: 4px 8px;
+  border-radius: 9999px;
+  border: 1px solid var(--border-soft, rgba(152, 168, 187, .28));
+  background: var(--surface-soft, #eef4fa);
+  color: var(--text-primary, #102132);
+  font-size: 12px;
+  cursor: pointer;
+  outline: none;
+  transition: border-color 0.15s;
+  max-width: 120px;
+}
+
+.kt-lang-select:focus {
+  border-color: var(--accent, #1d9bf0);
+}
+
+.kt-compose-translate-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 12px;
+  border-radius: 9999px;
+  border: 1px solid var(--border-soft, rgba(152, 168, 187, .28));
+  background: transparent;
+  color: var(--text-muted, #667b93);
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background-color 0.15s, border-color 0.15s, color 0.15s;
+}
+
+.kt-compose-translate-btn.kt-translated {
+  color: var(--accent, #1d9bf0);
+  border-color: var(--accent-soft, rgba(29, 155, 240, .14));
+}
+
+.kt-compose-translate-btn:hover:not(:disabled) {
+  background: var(--surface-soft, #eef4fa);
+  border-color: var(--neutral-300, #c6d5e4);
+  color: var(--text-secondary, #38516a);
+}
+
+.kt-compose-translate-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ===== トースト通知 ===== */
+
+.kt-toast {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  z-index: 99999;
+  pointer-events: none;
+  animation: kt-fade-in 0.2s ease;
+  box-shadow: var(--surface-shadow, 0 18px 38px rgba(16, 33, 50, .08));
+}
+
+.kt-toast-info {
+  background: var(--neutral-900, #142535);
+  color: var(--neutral-50, #f7fafc);
+}
+
+.kt-toast-error {
+  background: #dc2626;
+  color: #fff;
+}
+
+@keyframes kt-fade-in {
+  from { opacity: 0; transform: translateX(-50%) translateY(8px); }
+  to   { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
