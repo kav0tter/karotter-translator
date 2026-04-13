@@ -114,13 +114,15 @@
 }
 
 .kt-toast-info {
-  background: var(--neutral-900, #142535);
-  color: var(--neutral-50, #f7fafc);
+  background: rgba(15, 23, 32, 0.92);
+  color: #f0f6ff;
+  backdrop-filter: blur(6px);
 }
 
 .kt-toast-error {
-  background: #dc2626;
+  background: rgba(185, 28, 28, 0.95);
   color: #fff;
+  backdrop-filter: blur(6px);
 }
 
 @keyframes kt-fade-in {
