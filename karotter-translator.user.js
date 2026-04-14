@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Karotter Translator
 // @namespace    https://karotter.com/
-// @version      1.1.1
+// @version      1.1.2
 // @description  karotter.comの投稿をLLMで翻訳するユーザースクリプト
 // @author       kav0tter
 // @match        https://karotter.com/*
@@ -821,11 +821,13 @@ ${text}`;
   const _origPushState = history.pushState.bind(history);
   history.pushState = function (...args) {
     _origPushState(...args);
+    if (!window.location.pathname.startsWith('/settings')) _ktHidePanel();
     setTimeout(() => {
       if (window.location.pathname.startsWith('/settings')) injectKtSettings();
     }, 100);
   };
   window.addEventListener('popstate', () => {
+    if (!window.location.pathname.startsWith('/settings')) _ktHidePanel();
     if (window.location.pathname.startsWith('/settings')) setTimeout(injectKtSettings, 100);
   });
 
@@ -865,6 +867,10 @@ ${text}`;
     btn.addEventListener('click', () => {
       renderKtSettingsPanel();
       document.querySelector('main')?.scrollIntoView({ behavior: 'smooth' });
+    });
+    // 他のナビボタンをクリックしたらパネルを閉じる
+    [...mobileNav.querySelectorAll('button:not(#kt-mob-nav-btn)')].forEach(b => {
+      b.addEventListener('click', () => _ktHidePanel());
     });
   }
 
