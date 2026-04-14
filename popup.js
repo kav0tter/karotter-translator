@@ -44,7 +44,6 @@ function updateAutoTranslateWarning(checked) {
 
 document.getElementById('autoTranslate').addEventListener('change', (e) => {
   updateAutoTranslateWarning(e.target.checked);
-  saveSingleKey('autoTranslate', e.target.checked);
 });
 
 
@@ -162,9 +161,10 @@ document.getElementById('saveBtn').addEventListener('click', () => {
     return;
   }
 
+  const autoTranslate = document.getElementById('autoTranslate').checked;
   const debugMode     = document.getElementById('debugMode').checked;
 
-  chrome.storage.sync.set({ baseUrl, apiKey, model, language, maxContext, maxConcurrent, debugMode }, () => {
+  chrome.storage.sync.set({ baseUrl, apiKey, model, language, maxContext, maxConcurrent, autoTranslate, debugMode }, () => {
     statusEl.textContent = '設定を保存しました';
     statusEl.className = 'status success';
     setTimeout(() => { statusEl.className = 'status'; }, 2000);
