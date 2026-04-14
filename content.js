@@ -628,7 +628,10 @@ function processElement(el) {
 
   tryInjectCompose(el);
 
-  if (window.location.pathname.startsWith('/settings')) injectKtSettingsNavItem();
+  if (window.location.pathname.startsWith('/settings')) {
+    injectKtSettingsNavItem();
+    injectKtSettingsMobileNavItem();
+  }
 }
 
 const observer = new MutationObserver(mutations => {
@@ -644,7 +647,10 @@ document.querySelectorAll('[aria-label="リアクションを追加"]').forEach(
 document.querySelectorAll('form').forEach(f => injectComposeTranslateButton(f));
 // /settings ページ（複数回試行）
 function _ktInitialSettingsScan() {
-  if (window.location.pathname.startsWith('/settings')) injectKtSettingsNavItem();
+  if (window.location.pathname.startsWith('/settings')) {
+    injectKtSettingsNavItem();
+    injectKtSettingsMobileNavItem();
+  }
 }
 _ktInitialSettingsScan();
 setTimeout(_ktInitialSettingsScan, 500);
@@ -668,6 +674,48 @@ const _KT_LANGS = [
   'イタリア語', 'ポルトガル語', 'ロシア語', 'アラビア語',
   'ヒンディー語', 'タイ語', 'ベトナム語', 'インドネシア語',
 ];
+
+let _ktMobNavObserver = null;
+
+function _ktFindMobileNav() {
+  return document.querySelector('div.p-4 > nav');
+}
+
+function _ktDoInjectMobileNavBtn(mobileNav) {
+  if (document.getElementById('kt-mob-nav-btn')) return;
+  const btn = document.createElement('button');
+  btn.id = 'kt-mob-nav-btn';
+  btn.className = 'flex w-full items-center justify-between px-4 py-4 text-left transition-colors hover:bg-[var(--surface-soft)]';
+  btn.innerHTML = `<div class="min-w-0 pr-4"><div class="font-medium text-[var(--text-primary)]">Karotter Translator</div><div class="mt-1 text-xs text-[var(--text-muted)]">翻訳拡張機能の設定を管理します。</div></div><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;color:var(--text-muted)"><path d="m9 18 6-6-6-6"/></svg>`;
+  mobileNav.insertBefore(btn, mobileNav.firstChild);
+  btn.addEventListener('click', () => {
+    renderKtSettingsPanel();
+    document.querySelector('main')?.scrollIntoView({ behavior: 'smooth' });
+  });
+}
+
+function injectKtSettingsMobileNavItem() {
+  if (!window.location.pathname.startsWith('/settings')) return;
+  if (document.getElementById('kt-mob-nav-btn')) return;
+  const mobileNav = _ktFindMobileNav();
+  if (mobileNav) {
+    _ktDoInjectMobileNavBtn(mobileNav);
+    return;
+  }
+  if (_ktMobNavObserver) return;
+  _ktMobNavObserver = new MutationObserver(() => {
+    if (!window.location.pathname.startsWith('/settings')) {
+      _ktMobNavObserver.disconnect(); _ktMobNavObserver = null; return;
+    }
+    const nav = _ktFindMobileNav();
+    if (nav) {
+      _ktMobNavObserver.disconnect(); _ktMobNavObserver = null;
+      _ktDoInjectMobileNavBtn(nav);
+    }
+  });
+  _ktMobNavObserver.observe(document.body, { childList: true, subtree: true });
+  setTimeout(() => { _ktMobNavObserver?.disconnect(); _ktMobNavObserver = null; }, 10000);
+}
 
 function injectKtSettingsNavItem() {
   if (!window.location.pathname.startsWith('/settings')) return;
