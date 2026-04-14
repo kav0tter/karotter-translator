@@ -10,6 +10,8 @@
 // @grant        GM_xmlhttpRequest
 // @connect      *
 // @run-at       document-idle
+// @updateURL    https://raw.githubusercontent.com/kav0tter/karotter-translator/master/karotter-translator.user.js
+// @downloadURL  https://raw.githubusercontent.com/kav0tter/karotter-translator/master/karotter-translator.user.js
 // ==/UserScript==
 
 (function () {
