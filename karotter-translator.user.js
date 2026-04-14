@@ -8,7 +8,6 @@
 // @grant        GM_getValue
 // @grant        GM_setValue
 // @grant        GM_xmlhttpRequest
-// @grant        GM_addStyle
 // @connect      *
 // @run-at       document-idle
 // ==/UserScript==
@@ -18,7 +17,8 @@
 
   // ===== CSS =====
 
-  GM_addStyle(`
+  const _style = document.createElement('style');
+  _style.textContent = `
     .kt-disabled .kt-translate-btn-row,
     .kt-disabled .kt-compose-translate { display: none !important; }
 
@@ -284,16 +284,26 @@
       color: var(--text-muted, #667b93);
       margin-bottom: 8px;
     }
-  `);
+  `;
+  (document.head || document.documentElement).appendChild(_style);
 
   // ===== 設定ストレージ =====
 
   function getSetting(key, defaultValue) {
-    return GM_getValue(key, defaultValue);
+    try {
+      const v = GM_getValue(key, defaultValue);
+      return v !== undefined ? v : defaultValue;
+    } catch {
+      try { return JSON.parse(localStorage.getItem('kt_' + key)) ?? defaultValue; } catch { return defaultValue; }
+    }
   }
 
   function setSetting(key, value) {
-    GM_setValue(key, value);
+    try {
+      GM_setValue(key, value);
+    } catch {
+      try { localStorage.setItem('kt_' + key, JSON.stringify(value)); } catch { /* ignore */ }
+    }
   }
 
   // ===== 設定パネル =====
