@@ -642,8 +642,21 @@ observer.observe(document.body, { childList: true, subtree: true });
 document.querySelectorAll('[aria-label="リアクションを追加"]').forEach(injectTranslateButton);
 // 初期表示のインラインform（投稿詳細ページ）
 document.querySelectorAll('form').forEach(f => injectComposeTranslateButton(f));
-// /settings ページ
-if (window.location.pathname.startsWith('/settings')) setTimeout(injectKtSettingsNavItem, 500);
+// /settings ページ（複数回試行）
+function _ktInitialSettingsScan() {
+  if (window.location.pathname.startsWith('/settings')) injectKtSettingsNavItem();
+}
+_ktInitialSettingsScan();
+setTimeout(_ktInitialSettingsScan, 500);
+setTimeout(_ktInitialSettingsScan, 1500);
+
+// SPA ナビゲーション検知
+const _ktOrigPushState = history.pushState.bind(history);
+history.pushState = function (...args) {
+  _ktOrigPushState(...args);
+  setTimeout(_ktInitialSettingsScan, 100);
+};
+window.addEventListener('popstate', () => setTimeout(_ktInitialSettingsScan, 100));
 
 // ========== /settings ページ統合 ==========
 
