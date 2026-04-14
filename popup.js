@@ -14,17 +14,28 @@ const KEYS = ['enabled', 'baseUrl', 'apiKey', 'model', 'language', 'maxContext',
 
 // 設定を読み込んでフォームに反映
 chrome.storage.sync.get(KEYS, (data) => {
-  document.getElementById('enabled').checked  = data.enabled    ?? true;
-  document.getElementById('baseUrl').value    = data.baseUrl    || '';
-  document.getElementById('apiKey').value     = data.apiKey     || '';
-  document.getElementById('model').value      = data.model      || 'gpt-4o-mini';
-  document.getElementById('language').value   = data.language   || '日本語';
-  document.getElementById('maxContext').value      = data.maxContext    ?? 0;
+  document.getElementById('enabled').checked       = data.enabled       ?? true;
+  document.getElementById('baseUrl').value         = data.baseUrl       || '';
+  document.getElementById('apiKey').value          = data.apiKey        || '';
+  document.getElementById('model').value           = data.model         || 'gpt-4o-mini';
+  document.getElementById('language').value        = data.language      || '日本語';
+  document.getElementById('maxContext').value      = data.maxContext     ?? 0;
   document.getElementById('maxConcurrent').value   = data.maxConcurrent ?? 3;
   const autoTranslateEl = document.getElementById('autoTranslate');
   autoTranslateEl.checked = data.autoTranslate ?? false;
   updateAutoTranslateWarning(autoTranslateEl.checked);
   document.getElementById('debugMode').checked     = data.debugMode     ?? false;
+});
+
+// ========== 即時反映トグル ==========
+// トグル系は変更と同時に保存。保存ボタンは不要。
+
+function saveSingleKey(key, value) {
+  chrome.storage.sync.set({ [key]: value });
+}
+
+document.getElementById('enabled').addEventListener('change', (e) => {
+  saveSingleKey('enabled', e.target.checked);
 });
 
 function updateAutoTranslateWarning(checked) {
@@ -33,6 +44,11 @@ function updateAutoTranslateWarning(checked) {
 
 document.getElementById('autoTranslate').addEventListener('change', (e) => {
   updateAutoTranslateWarning(e.target.checked);
+  saveSingleKey('autoTranslate', e.target.checked);
+});
+
+document.getElementById('debugMode').addEventListener('change', (e) => {
+  saveSingleKey('debugMode', e.target.checked);
 });
 
 // ========== プリセット ==========
@@ -66,7 +82,7 @@ document.getElementById('presetSelect').addEventListener('change', (e) => {
     document.getElementById('baseUrl').value = preset.baseUrl;
     document.getElementById('apiKey').value  = preset.apiKey;
     document.getElementById('model').value   = preset.model;
-    // 即時反映
+    // 切り替えは即時反映
     chrome.storage.sync.set({ baseUrl: preset.baseUrl, apiKey: preset.apiKey, model: preset.model });
   });
 });
@@ -77,7 +93,7 @@ document.getElementById('presetSaveBtn').addEventListener('click', () => {
   const apiKey  = document.getElementById('apiKey').value.trim();
   const model   = document.getElementById('model').value.trim() || 'gpt-4o-mini';
 
-  if (!name)    { alert('プリセット名を入力してください'); return; }
+  if (!name)             { alert('プリセット名を入力してください'); return; }
   if (!baseUrl || !apiKey) { alert('Base URL と API Key を入力してください'); return; }
 
   chrome.storage.sync.get('configPresets', ({ configPresets = [] }) => {
@@ -114,8 +130,8 @@ function formatNumber(n) {
 
 function loadStats() {
   chrome.storage.local.get('stats', ({ stats = {} }) => {
-    document.getElementById('statsRequests').textContent  = formatNumber(stats.requests         || 0);
-    document.getElementById('statsPrompt').textContent    = formatNumber(stats.promptTokens     || 0);
+    document.getElementById('statsRequests').textContent   = formatNumber(stats.requests         || 0);
+    document.getElementById('statsPrompt').textContent     = formatNumber(stats.promptTokens     || 0);
     document.getElementById('statsCompletion').textContent = formatNumber(stats.completionTokens || 0);
   });
 }
@@ -131,17 +147,15 @@ document.getElementById('statsResetBtn').addEventListener('click', () => {
   chrome.storage.local.set({ stats: { requests: 0, promptTokens: 0, completionTokens: 0 } }, loadStats);
 });
 
-// 保存
+// ========== 保存ボタン（API設定・数値設定） ==========
+
 document.getElementById('saveBtn').addEventListener('click', () => {
-  const baseUrl    = document.getElementById('baseUrl').value.trim();
-  const apiKey     = document.getElementById('apiKey').value.trim();
-  const model      = document.getElementById('model').value.trim() || 'gpt-4o-mini';
-  const language   = document.getElementById('language').value;
-  const enabled       = document.getElementById('enabled').checked;
+  const baseUrl       = document.getElementById('baseUrl').value.trim();
+  const apiKey        = document.getElementById('apiKey').value.trim();
+  const model         = document.getElementById('model').value.trim() || 'gpt-4o-mini';
+  const language      = document.getElementById('language').value;
   const maxContext    = parseInt(document.getElementById('maxContext').value) || 0;
   const maxConcurrent = parseInt(document.getElementById('maxConcurrent').value) || 3;
-  const autoTranslate = document.getElementById('autoTranslate').checked;
-  const debugMode     = document.getElementById('debugMode').checked;
 
   const statusEl = document.getElementById('status');
 
@@ -151,7 +165,7 @@ document.getElementById('saveBtn').addEventListener('click', () => {
     return;
   }
 
-  chrome.storage.sync.set({ enabled, baseUrl, apiKey, model, language, maxContext, maxConcurrent, autoTranslate, debugMode }, () => {
+  chrome.storage.sync.set({ baseUrl, apiKey, model, language, maxContext, maxConcurrent }, () => {
     statusEl.textContent = '設定を保存しました';
     statusEl.className = 'status success';
     setTimeout(() => { statusEl.className = 'status'; }, 2000);
