@@ -849,29 +849,56 @@ ${text}`;
     injectKtSettingsMobileNavItem();
   }
 
-  function injectKtSettingsMobileNavItem() {
-    if (!window.location.pathname.startsWith('/settings')) return;
-    if (document.getElementById('kt-mob-nav-btn')) return;
-    const mobileNav = [...document.querySelectorAll('nav')].find(n =>
-      n.className.includes('overflow-hidden') &&
-      n.className.includes('rounded-2xl') &&
-      n.parentElement?.className?.includes('p-4')
-    );
-    if (!mobileNav) {
-      setTimeout(injectKtSettingsMobileNavItem, 300);
-      return;
-    }
+  let _ktMobNavObserver = null;
 
+  function _findMobileNav() {
+    return document.querySelector('div.p-4 > nav');
+  }
+
+  function _doInjectMobileNavBtn(mobileNav) {
+    if (document.getElementById('kt-mob-nav-btn')) return;
     const btn = document.createElement('button');
     btn.id = 'kt-mob-nav-btn';
     btn.className = 'flex w-full items-center justify-between px-4 py-4 text-left transition-colors hover:bg-[var(--surface-soft)]';
     btn.innerHTML = `<div class="min-w-0 pr-4"><div class="font-medium text-[var(--text-primary)]">Karotter Translator</div><div class="mt-1 text-xs text-[var(--text-muted)]">翻訳拡張機能の設定を管理します。</div></div><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;color:var(--text-muted)"><path d="m9 18 6-6-6-6"/></svg>`;
     mobileNav.insertBefore(btn, mobileNav.firstChild);
-
     btn.addEventListener('click', () => {
       renderKtSettingsPanel();
       document.querySelector('main')?.scrollIntoView({ behavior: 'smooth' });
     });
+  }
+
+  function injectKtSettingsMobileNavItem() {
+    if (!window.location.pathname.startsWith('/settings')) return;
+    if (document.getElementById('kt-mob-nav-btn')) return;
+
+    const mobileNav = _findMobileNav();
+    if (mobileNav) {
+      _doInjectMobileNavBtn(mobileNav);
+      return;
+    }
+
+    // nav がまだ DOM にない場合は MutationObserver で出現を待つ
+    if (_ktMobNavObserver) return; // 既に監視中
+    _ktMobNavObserver = new MutationObserver(() => {
+      if (!window.location.pathname.startsWith('/settings')) {
+        _ktMobNavObserver.disconnect();
+        _ktMobNavObserver = null;
+        return;
+      }
+      const nav = _findMobileNav();
+      if (nav) {
+        _ktMobNavObserver.disconnect();
+        _ktMobNavObserver = null;
+        _doInjectMobileNavBtn(nav);
+      }
+    });
+    _ktMobNavObserver.observe(document.body, { childList: true, subtree: true });
+    // 10秒後に自動解除
+    setTimeout(() => {
+      _ktMobNavObserver?.disconnect();
+      _ktMobNavObserver = null;
+    }, 10000);
   }
 
   const _KT_LANGS = [
