@@ -774,15 +774,16 @@ function injectKtSettingsNavItem() {
 }
 
 function renderKtSettingsPanel() {
-  const mainEl = document.querySelector('main');
-  if (!mainEl) return;
+  const container = document.querySelector('div.p-4') ?? document.querySelector('main');
+  if (!container) return;
+  const mainEl = container;
 
   // スタイルをheadに1回だけ注入
   if (!document.getElementById('kt-sp-style')) {
     const s = document.createElement('style');
     s.id = 'kt-sp-style';
     s.textContent = `
-main{position:relative}#kt-sp{position:absolute;top:0;left:0;right:0;min-height:100%;z-index:10;background:var(--bg-primary,#fff);padding:24px;max-width:560px}
+main:has(#kt-sp)>*:not(#kt-sp),div.p-4:has(#kt-sp)>*:not(#kt-sp){display:none!important}#kt-sp{padding:24px;max-width:560px}
 #kt-sp h2{font-size:18px;font-weight:700;color:var(--text-primary);margin:0 0 4px}
 #kt-sp .sub{font-size:13px;color:var(--text-muted);margin:0 0 20px}
 #kt-sp .card{background:var(--surface-card,#fff);border:1px solid var(--border-soft);border-radius:12px;padding:16px 20px;margin-bottom:14px}
