@@ -3,7 +3,7 @@
 ![version](https://img.shields.io/badge/version-1.0.0-blue?style=flat-square)
 ![manifest](https://img.shields.io/badge/manifest-v3-brightgreen?style=flat-square)
 ![license](https://img.shields.io/github/license/kav0tter/karotter-translator?style=flat-square)
-![Chrome](https://img.shields.io/badge/Chrome-拡張機能-yellow?style=flat-square&logo=googlechrome&logoColor=white)
+![Chrome](https://img.shields.io/badge/Chrome-Extension-yellow?style=flat-square&logo=googlechrome&logoColor=white)
 ![Firefox](https://img.shields.io/badge/Firefox-Userscript-orange?style=flat-square&logo=firefox&logoColor=white)
 ![Safari](https://img.shields.io/badge/Safari-Userscript-blue?style=flat-square&logo=safari&logoColor=white)
 ![karotter studio](https://img.shields.io/badge/karotter_studio-compatible-blueviolet?style=flat-square)
@@ -88,7 +88,6 @@ Firefox・Safari・その他のブラウザでも Userscript として動作し�
 |---|---|
 | Firefox | [Tampermonkey](https://addons.mozilla.org/ja/firefox/addon/tampermonkey/) / [Violentmonkey](https://addons.mozilla.org/ja/firefox/addon/violentmonkey/) |
 | Safari | [Userscripts](https://apps.apple.com/jp/app/userscripts/id1463298887) |
-| Chrome | [Tampermonkey](https://chromewebstore.google.com/detail/tampermonkey/dhdgffkkebhmkfjojejmpbldmpobfkfo) |
 
 マネージャーをインストール後、以下のURLをブラウザで開くとインストールダイアログが表示されます：
 
