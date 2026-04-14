@@ -582,23 +582,28 @@
   // ===== API呼び出し =====
 
   function gmFetch(url, options) {
-    return new Promise((resolve, reject) => {
-      GM_xmlhttpRequest({
-        method: options.method || 'GET',
-        url,
-        headers: options.headers || {},
-        data: options.body,
-        onload: (res) => {
-          resolve({
-            ok: res.status >= 200 && res.status < 300,
-            status: res.status,
-            text: () => Promise.resolve(res.responseText),
-            json: () => Promise.resolve(JSON.parse(res.responseText)),
-          });
-        },
-        onerror: (err) => reject(new Error('ネットワークエラー: ' + (err.error || ''))),
+    // GM_xmlhttpRequest が使える場合はCORS制限なしで呼ぶ
+    if (typeof GM_xmlhttpRequest === 'function') {
+      return new Promise((resolve, reject) => {
+        GM_xmlhttpRequest({
+          method: options.method || 'GET',
+          url,
+          headers: options.headers || {},
+          data: options.body,
+          onload: (res) => {
+            resolve({
+              ok: res.status >= 200 && res.status < 300,
+              status: res.status,
+              text: () => Promise.resolve(res.responseText),
+              json: () => Promise.resolve(JSON.parse(res.responseText)),
+            });
+          },
+          onerror: (err) => reject(new Error('ネットワークエラー: ' + (err.error || ''))),
+        });
       });
-    });
+    }
+    // フォールバック: 通常の fetch（CORSが許可されているAPIのみ動作）
+    return fetch(url, options);
   }
 
   async function handleTranslate({ text, targetLanguage, sourceLanguage, context, authorName, authorHandle, debug }) {
@@ -1067,8 +1072,15 @@ ${text}`;
 
   observer.observe(document.body, { childList: true, subtree: true });
 
-  document.querySelectorAll('[aria-label="リアクションを追加"]').forEach(injectTranslateButton);
-  document.querySelectorAll('form').forEach(f => injectComposeTranslateButton(f));
+  // 初回スキャン（SPAのレンダリング遅延に対応して複数回試行）
+  function initialScan() {
+    document.querySelectorAll('[aria-label="リアクションを追加"]').forEach(injectTranslateButton);
+    document.querySelectorAll('form').forEach(f => injectComposeTranslateButton(f));
+  }
+
+  initialScan();
+  setTimeout(initialScan, 500);
+  setTimeout(initialScan, 1500);
 
   injectSettingsButton();
 
