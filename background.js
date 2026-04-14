@@ -58,24 +58,32 @@ ${text}`;
 
   const endpoint = baseUrl.replace(/\/$/, '') + '/chat/completions';
 
-  const baseMessages = [
-    { role: 'system', content: systemPrompt },
-    { role: 'user', content: userPrompt },
-  ];
+  const modelKey = `${model || 'gpt-4o-mini'}@${baseUrl}`;
+  const { compatFlags = {} } = await chrome.storage.local.get('compatFlags');
+  const needsFallback = compatFlags[modelKey] ?? false;
 
-  const requestBody = {
-    model: model || 'gpt-4o-mini',
-    messages: baseMessages,
-    temperature: 0.3,
-    max_tokens: 300,
-  };
+  const buildBody = (fallback) => fallback
+    ? {
+        model: model || 'gpt-4o-mini',
+        messages: [{ role: 'user', content: `${systemPrompt}\n\n${userPrompt}` }],
+        temperature: 0.3,
+      }
+    : {
+        model: model || 'gpt-4o-mini',
+        messages: [
+          { role: 'system', content: systemPrompt },
+          { role: 'user', content: userPrompt },
+        ],
+        temperature: 0.3,
+        max_tokens: 300,
+      };
 
   if (debug) {
     console.log('[KT] APIリクエスト ─────────────────');
     console.log('[KT] endpoint:', endpoint);
     console.log('[KT] system prompt:\n', systemPrompt);
     console.log('[KT] user prompt:\n', userPrompt);
-    console.log('[KT] model:', requestBody.model);
+    console.log('[KT] model:', model, needsFallback ? '(fallbackモード)' : '');
   }
 
   const fetchRequest = (body) => fetch(endpoint, {
@@ -84,26 +92,25 @@ ${text}`;
     body: JSON.stringify(body),
   });
 
-  let response = await fetchRequest(requestBody);
+  let response = await fetchRequest(buildBody(needsFallback));
 
-  // 400 INVALID_ARGUMENT: max_tokensやsystemロールが非対応のモデル向けフォールバック
-  if (response.status === 400) {
+  // 400エラー時、まだフォールバック未使用ならリトライしてモデルを記憶
+  if (response.status === 400 && !needsFallback) {
     const errorText = await response.text();
     if (debug) console.log('[KT] 400エラー、フォールバックリトライ:', errorText);
 
-    const fallbackBody = {
-      model: requestBody.model,
-      // systemロールをuserメッセージ先頭に統合
-      messages: [{ role: 'user', content: `${systemPrompt}\n\n${userPrompt}` }],
-      temperature: requestBody.temperature,
-      // max_tokensを除外
-    };
-    response = await fetchRequest(fallbackBody);
+    response = await fetchRequest(buildBody(true));
 
     if (!response.ok) {
       const fallbackError = await response.text();
       throw new Error(`API エラー (${response.status}): ${fallbackError}`);
     }
+
+    // 成功したのでフォールバックが必要なモデルとして記憶
+    await chrome.storage.local.set({
+      compatFlags: { ...compatFlags, [modelKey]: true },
+    });
+    if (debug) console.log('[KT] フォールバックモードを記憶:', modelKey);
   } else if (!response.ok) {
     const errorText = await response.text();
     throw new Error(`API エラー (${response.status}): ${errorText}`);
