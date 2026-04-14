@@ -120,6 +120,10 @@ function loadStats() {
 
 loadStats();
 
+chrome.storage.onChanged.addListener((changes, area) => {
+  if (area === 'local' && changes.stats) loadStats();
+});
+
 document.getElementById('statsResetBtn').addEventListener('click', () => {
   if (!confirm('使用状況をリセットしますか？')) return;
   chrome.storage.local.set({ stats: { requests: 0, promptTokens: 0, completionTokens: 0 } }, loadStats);
