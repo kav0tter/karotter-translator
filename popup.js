@@ -47,9 +47,6 @@ document.getElementById('autoTranslate').addEventListener('change', (e) => {
   saveSingleKey('autoTranslate', e.target.checked);
 });
 
-document.getElementById('debugMode').addEventListener('change', (e) => {
-  saveSingleKey('debugMode', e.target.checked);
-});
 
 // ========== プリセット ==========
 
@@ -165,7 +162,9 @@ document.getElementById('saveBtn').addEventListener('click', () => {
     return;
   }
 
-  chrome.storage.sync.set({ baseUrl, apiKey, model, language, maxContext, maxConcurrent }, () => {
+  const debugMode     = document.getElementById('debugMode').checked;
+
+  chrome.storage.sync.set({ baseUrl, apiKey, model, language, maxContext, maxConcurrent, debugMode }, () => {
     statusEl.textContent = '設定を保存しました';
     statusEl.className = 'status success';
     setTimeout(() => { statusEl.className = 'status'; }, 2000);
