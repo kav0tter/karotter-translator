@@ -50,9 +50,8 @@ document.getElementById('autoTranslate').addEventListener('change', (e) => {
 // ========== プリセット ==========
 
 function loadPresets() {
-  chrome.storage.sync.get('configPresets', ({ configPresets = [] }) => {
+  chrome.storage.sync.get(['configPresets', 'activePresetId'], ({ configPresets = [], activePresetId = '' }) => {
     const sel = document.getElementById('presetSelect');
-    const currentId = sel.value;
     sel.innerHTML = '<option value="">— 選択して切り替え —</option>';
     configPresets.forEach(p => {
       const opt = document.createElement('option');
@@ -60,7 +59,7 @@ function loadPresets() {
       opt.textContent = p.name;
       sel.appendChild(opt);
     });
-    sel.value = currentId;
+    sel.value = activePresetId;
     document.getElementById('presetDeleteBtn').disabled = !sel.value;
   });
 }
@@ -78,8 +77,8 @@ document.getElementById('presetSelect').addEventListener('change', (e) => {
     document.getElementById('baseUrl').value = preset.baseUrl;
     document.getElementById('apiKey').value  = preset.apiKey;
     document.getElementById('model').value   = preset.model;
-    // 切り替えは即時反映
-    chrome.storage.sync.set({ baseUrl: preset.baseUrl, apiKey: preset.apiKey, model: preset.model });
+    // 切り替えは即時反映、選択状態も保存
+    chrome.storage.sync.set({ baseUrl: preset.baseUrl, apiKey: preset.apiKey, model: preset.model, activePresetId: id });
   });
 });
 
@@ -110,9 +109,10 @@ document.getElementById('presetDeleteBtn').addEventListener('click', () => {
   if (!id) return;
   if (!confirm(`「${name}」を削除しますか？`)) return;
 
-  chrome.storage.sync.get('configPresets', ({ configPresets = [] }) => {
+  chrome.storage.sync.get(['configPresets', 'activePresetId'], ({ configPresets = [], activePresetId }) => {
     const updated = configPresets.filter(p => p.id !== id);
-    chrome.storage.sync.set({ configPresets: updated }, loadPresets);
+    const clear = activePresetId === id ? { activePresetId: '' } : {};
+    chrome.storage.sync.set({ configPresets: updated, ...clear }, loadPresets);
   });
 });
 
