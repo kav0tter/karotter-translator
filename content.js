@@ -500,7 +500,14 @@ function isChromeApiAvailable() {
 
 async function getStorage(keys) {
   if (!isChromeApiAvailable()) throw new Error('拡張機能が無効です。ページをリロードしてください。');
-  return chrome.storage.sync.get(keys);
+  try {
+    return await chrome.storage.sync.get(keys);
+  } catch (e) {
+    if (e.message?.includes('Extension context invalidated')) {
+      throw new Error('拡張機能が再読み込みされました。ページをリロードしてください。');
+    }
+    throw e;
+  }
 }
 
 // ========== メッセージ送信（リトライ付き） ==========
