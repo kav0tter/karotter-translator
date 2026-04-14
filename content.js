@@ -707,7 +707,7 @@ function injectKtSettingsNavItem() {
 }
 
 function renderKtSettingsPanel() {
-  const mainEl = document.querySelector('aside')?.parentElement?.querySelector('main');
+  const mainEl = document.querySelector('main');
   if (!mainEl) return;
 
   // スタイルをheadに1回だけ注入
@@ -1000,7 +1000,7 @@ function initKtSettingsForm() {
 
 function _ktHidePanel() {
   document.getElementById('kt-sp')?.remove();
-  const mainEl = document.querySelector('aside')?.parentElement?.querySelector('main');
+  const mainEl = document.querySelector('main');
   if (mainEl) [...mainEl.children].forEach(el => { el.hidden = false; });
 }
 
