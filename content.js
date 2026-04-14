@@ -627,6 +627,8 @@ function processElement(el) {
   if (el.matches('[aria-label="リアクションを追加"]')) injectTranslateButton(el);
 
   tryInjectCompose(el);
+
+  if (window.location.pathname.startsWith('/settings')) injectKtSettingsNavItem();
 }
 
 const observer = new MutationObserver(mutations => {
@@ -640,3 +642,398 @@ observer.observe(document.body, { childList: true, subtree: true });
 document.querySelectorAll('[aria-label="リアクションを追加"]').forEach(injectTranslateButton);
 // 初期表示のインラインform（投稿詳細ページ）
 document.querySelectorAll('form').forEach(f => injectComposeTranslateButton(f));
+// /settings ページ
+if (window.location.pathname.startsWith('/settings')) setTimeout(injectKtSettingsNavItem, 500);
+
+// ========== /settings ページ統合 ==========
+
+let _ktActive = false; // KT設定タブがアクティブかどうか
+
+const _KT_LANGS = [
+  '日本語', '英語', '中国語（簡体字）', '中国語（繁体字）',
+  '韓国語', 'フランス語', 'スペイン語', 'ドイツ語',
+  'イタリア語', 'ポルトガル語', 'ロシア語', 'アラビア語',
+  'ヒンディー語', 'タイ語', 'ベトナム語', 'インドネシア語',
+];
+
+function injectKtSettingsNavItem() {
+  if (!window.location.pathname.startsWith('/settings')) return;
+  if (document.getElementById('kt-nav-btn')) return;
+  const nav = document.querySelector('aside nav.flex.flex-col');
+  if (!nav) return;
+
+  // 現在アクティブなボタンのクラスを取得してテーマに合わせる
+  const existActive = [...nav.querySelectorAll('button')].find(b => b.className.includes('text-white'));
+  const ACT_CLS = existActive?.className ?? '';
+  const ACT_SUB = existActive?.querySelector('div:last-child')?.className ?? '';
+  const INACT_CLS = 'w-full rounded-xl px-3 py-3 text-left transition text-[var(--text-secondary)] hover:bg-[var(--surface-soft)] hover:text-[var(--text-primary)]';
+  const INACT_SUB = 'mt-1 text-xs leading-5 text-[var(--text-muted)]';
+
+  const btn = document.createElement('button');
+  btn.id = 'kt-nav-btn';
+  btn.innerHTML = `<div class="font-semibold">Karotter Translator</div><div id="kt-nav-sub" class="${INACT_SUB}">翻訳拡張機能の設定を管理します。</div>`;
+  nav.insertBefore(btn, nav.firstChild);
+
+  const setActive = (active) => {
+    _ktActive = active;
+    btn.className = (active && ACT_CLS) ? ACT_CLS : INACT_CLS;
+    const sub = document.getElementById('kt-nav-sub');
+    if (sub) sub.className = (active && ACT_SUB) ? ACT_SUB : INACT_SUB;
+    if (!active) _ktHidePanel();
+  };
+
+  setActive(_ktActive);
+
+  btn.addEventListener('click', () => {
+    // 他の設定ボタンを視覚的にinactiveに戻す
+    [...nav.querySelectorAll('button:not(#kt-nav-btn)')].forEach(b => {
+      b.className = INACT_CLS;
+      const s = b.querySelector('div:last-child');
+      if (s) s.className = INACT_SUB;
+    });
+    setActive(true);
+    renderKtSettingsPanel();
+  });
+
+  // 他ボタンのクリックでKT設定を非アクティブに
+  [...nav.querySelectorAll('button:not(#kt-nav-btn)')].forEach(b => {
+    b.addEventListener('click', () => setActive(false));
+  });
+
+  if (_ktActive) renderKtSettingsPanel();
+}
+
+function renderKtSettingsPanel() {
+  const mainEl = document.querySelector('aside')?.parentElement?.querySelector('main');
+  if (!mainEl) return;
+
+  // スタイルをheadに1回だけ注入
+  if (!document.getElementById('kt-sp-style')) {
+    const s = document.createElement('style');
+    s.id = 'kt-sp-style';
+    s.textContent = `
+#kt-sp{padding:24px;max-width:560px}
+#kt-sp h2{font-size:18px;font-weight:700;color:var(--text-primary);margin:0 0 4px}
+#kt-sp .sub{font-size:13px;color:var(--text-muted);margin:0 0 20px}
+#kt-sp .card{background:var(--surface-card,#fff);border:1px solid var(--border-soft);border-radius:12px;padding:16px 20px;margin-bottom:14px}
+#kt-sp .sec{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--text-muted);margin-bottom:12px}
+#kt-sp .field{display:flex;flex-direction:column;gap:5px;margin-bottom:12px}
+#kt-sp .field:last-child{margin-bottom:0}
+#kt-sp .lbl{font-size:12px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em}
+#kt-sp .hint{font-size:11px;color:var(--text-muted)}
+#kt-sp input[type=text],#kt-sp input[type=url],#kt-sp input[type=password],#kt-sp input[type=number],#kt-sp select{padding:8px 10px;border:1px solid var(--border-soft);border-radius:6px;font-size:13px;color:var(--text-primary);background:var(--surface-card,#fff);outline:none;width:100%;transition:border-color .15s;box-sizing:border-box;font-family:inherit}
+#kt-sp input:focus,#kt-sp select:focus{border-color:var(--accent,#2563eb)}
+#kt-sp .master{display:flex;align-items:center;justify-content:space-between;background:var(--surface-soft);border:1px solid var(--border-soft);border-radius:12px;padding:14px 16px;margin-bottom:14px;cursor:pointer;user-select:none}
+#kt-sp .master-lbl{font-size:14px;font-weight:600;color:var(--text-primary)}
+#kt-sp .master input{display:none}
+#kt-sp .tog{display:flex;align-items:center;justify-content:space-between;cursor:pointer;user-select:none}
+#kt-sp .tog>span:first-child{font-size:13px;color:var(--text-secondary)}
+#kt-sp .tog input{display:none}
+#kt-sp .trk{position:relative;width:36px;height:20px;background:var(--neutral-200,#dce6ef);border-radius:9999px;transition:background .2s;flex-shrink:0}
+#kt-sp .thm{position:absolute;top:2px;left:2px;width:16px;height:16px;background:#fff;border-radius:50%;transition:transform .2s;box-shadow:0 1px 3px rgba(0,0,0,.2)}
+#kt-sp .tog input:checked~.trk,#kt-sp .master input:checked~.trk{background:var(--accent,#2563eb)}
+#kt-sp .tog input:checked~.trk .thm,#kt-sp .master input:checked~.trk .thm{transform:translateX(16px)}
+#kt-sp .row{display:flex;gap:6px}
+#kt-sp .row>input,#kt-sp .row>select{flex:1}
+#kt-sp .icn{flex-shrink:0;display:flex;align-items:center;justify-content:center;width:36px;height:36px;border:1px solid var(--border-soft);border-radius:6px;background:var(--surface-card,#fff);color:var(--text-muted);cursor:pointer;transition:color .15s,border-color .15s}
+#kt-sp .icn:hover:not(:disabled){color:#dc2626;border-color:#dc2626}
+#kt-sp .icn:disabled{opacity:.3;cursor:not-allowed}
+#kt-sp .sbtn{flex-shrink:0;padding:8px 12px;border-radius:6px;border:none;background:var(--accent,#2563eb);color:#fff;font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;transition:filter .15s;font-family:inherit}
+#kt-sp .sbtn:hover{filter:brightness(.9)}
+#kt-sp .warn{display:none;align-items:flex-start;gap:6px;background:#fefce8;border:1px solid #fde047;border-radius:8px;padding:10px 12px;font-size:12px;color:#854d0e;line-height:1.5;margin-top:8px}
+#kt-sp .warn.on{display:flex}
+@media(prefers-color-scheme:dark){#kt-sp .warn{background:#2d2200;border-color:#a16207;color:#fcd34d}}
+#kt-sp .sgrid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:10px}
+#kt-sp .sv{font-size:16px;font-weight:700;color:var(--text-primary)}
+#kt-sp .sl{font-size:11px;color:var(--text-muted);margin-top:2px}
+#kt-sp .shdr{display:flex;align-items:center;justify-content:space-between}
+#kt-sp .rstbtn{font-size:11px;color:var(--text-muted);background:none;border:none;cursor:pointer;text-decoration:underline;text-underline-offset:2px;padding:0;font-family:inherit}
+#kt-sp .rstbtn:hover{color:#dc2626}
+#kt-sp hr{border:none;border-top:1px solid var(--border-soft);margin:12px 0}
+#kt-sp .savbtn{display:flex;align-items:center;justify-content:center;gap:6px;width:100%;padding:12px;border-radius:10px;border:none;background:var(--accent,#2563eb);color:#fff;font-size:14px;font-weight:600;cursor:pointer;transition:filter .15s;font-family:inherit;margin-bottom:8px}
+#kt-sp .savbtn:hover{filter:brightness(.9)}
+#kt-sp .st{font-size:12px;text-align:center;padding:6px;border-radius:6px;min-height:28px}
+#kt-sp .st.ok{background:rgba(37,99,235,.1);color:var(--accent,#2563eb)}
+#kt-sp .st.err{background:#fee2e2;color:#991b1b}
+#kt-sp #kt-sp-dbg{display:none}
+#kt-sp #kt-sp-dbg.on{display:flex}`;
+    document.head.appendChild(s);
+  }
+
+  // Reactのコンテンツを隠す（削除しない → ナビが引き続き機能する）
+  [...mainEl.children].forEach(el => { if (el.id !== 'kt-sp') el.hidden = true; });
+  document.getElementById('kt-sp')?.remove();
+
+  const _panel = document.createElement('div');
+  _panel.id = 'kt-sp';
+  const lo = _KT_LANGS.map(l => `<option value="${l}">${l}</option>`).join('');
+  _panel.innerHTML = `
+  <h2>Karotter Translator</h2>
+  <p class="sub">翻訳拡張機能の設定を管理します。</p>
+
+  <label class="master">
+    <span class="master-lbl">翻訳機能を有効にする</span>
+    <input type="checkbox" id="ks-en">
+    <span class="trk"><span class="thm"></span></span>
+  </label>
+
+  <div class="card">
+    <div class="sec">プリセット</div>
+    <div class="field">
+      <div class="row">
+        <select id="ks-preset"><option value="">— 選択して切り替え —</option></select>
+        <button class="icn" id="ks-pdel" title="削除" disabled>
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+        </button>
+      </div>
+    </div>
+    <div class="field">
+      <div class="row">
+        <input type="text" id="ks-pname" placeholder="プリセット名を入力して保存">
+        <button class="sbtn" id="ks-psave">保存</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="sec">API設定</div>
+    <div class="field">
+      <label class="lbl" for="ks-url">Base URL</label>
+      <input type="url" id="ks-url" placeholder="https://api.openai.com/v1">
+      <span class="hint">OpenAI互換APIのエンドポイント</span>
+    </div>
+    <div class="field">
+      <label class="lbl" for="ks-key">API Key</label>
+      <input type="password" id="ks-key" placeholder="sk-...">
+    </div>
+    <div class="field">
+      <label class="lbl" for="ks-model">モデル</label>
+      <input type="text" id="ks-model" placeholder="gpt-4o-mini">
+      <span class="hint">使用するモデルID（例: gpt-4o, gemma-3-27b-it）</span>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="sec">翻訳設定</div>
+    <div class="field">
+      <label class="lbl" for="ks-lang">翻訳先デフォルト言語</label>
+      <select id="ks-lang">${lo}</select>
+      <span class="hint">投稿一覧の「翻訳」ボタンで使う言語</span>
+    </div>
+    <div class="field">
+      <label class="lbl" for="ks-ctx">スレッドコンテキスト取得数</label>
+      <input type="number" id="ks-ctx" min="0" placeholder="0">
+      <span class="hint">返信翻訳時に遡る投稿数（0 = 無制限）</span>
+    </div>
+    <div class="field">
+      <label class="lbl" for="ks-conc">自動翻訳の同時実行数</label>
+      <input type="number" id="ks-conc" min="-1" max="10" placeholder="3">
+      <span class="hint">一度に並列翻訳する最大数（0 以下 = 無制限）</span>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="sec">オプション</div>
+    <label class="tog">
+      <span>自動翻訳モード</span>
+      <input type="checkbox" id="ks-auto">
+      <span class="trk"><span class="thm"></span></span>
+    </label>
+    <div class="warn" id="ks-awarn">
+      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0;margin-top:1px"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>
+      <span>投稿が表示されるたびに自動で翻訳します。表示中の全投稿がAPIを呼び出すため、コストが大幅に増加する場合があります。</span>
+    </div>
+    <hr>
+    <label class="tog" id="kt-sp-dbg">
+      <span>デバッグモード</span>
+      <input type="checkbox" id="ks-debug">
+      <span class="trk"><span class="thm"></span></span>
+    </label>
+  </div>
+
+  <div class="card">
+    <div class="shdr">
+      <div class="sec" style="margin:0">使用状況</div>
+      <button class="rstbtn" id="ks-sreset">リセット</button>
+    </div>
+    <div class="sgrid">
+      <div><div class="sv" id="ks-sreq">—</div><div class="sl">リクエスト数</div></div>
+      <div><div class="sv" id="ks-sin">—</div><div class="sl">入力トークン</div></div>
+      <div><div class="sv" id="ks-sout">—</div><div class="sl">出力トークン</div></div>
+    </div>
+  </div>
+
+  <button class="savbtn" id="ks-save">
+    <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+    設定を保存
+  </button>
+  <div class="st" id="ks-st"></div>`;
+  mainEl.appendChild(_panel);
+
+  initKtSettingsForm();
+}
+
+function initKtSettingsForm() {
+  const g = id => document.getElementById(id);
+
+  chrome.storage.sync.get(
+    ['enabled', 'baseUrl', 'apiKey', 'model', 'language', 'maxContext', 'maxConcurrent', 'autoTranslate', 'debugMode'],
+    (d) => {
+      if (!g('ks-url')) return; // パネルが消えた場合
+      g('ks-en').checked   = d.enabled       ?? true;
+      g('ks-url').value    = d.baseUrl        || '';
+      g('ks-key').value    = d.apiKey         || '';
+      g('ks-model').value  = d.model          || 'gpt-4o-mini';
+      g('ks-lang').value   = d.language       || '日本語';
+      g('ks-ctx').value    = d.maxContext     ?? 0;
+      g('ks-conc').value   = d.maxConcurrent  ?? 3;
+      g('ks-auto').checked  = d.autoTranslate  ?? false;
+      g('ks-debug').checked = d.debugMode      ?? false;
+      if (d.debugMode) g('kt-sp-dbg').classList.add('on');
+      _ktToggleAutoWarn(d.autoTranslate ?? false);
+    }
+  );
+
+  _ktLoadPresets();
+  _ktLoadStats();
+
+  // 即時反映トグル（enabled）
+  g('ks-en').addEventListener('change', e => {
+    chrome.storage.sync.set({ enabled: e.target.checked });
+    extensionEnabled = e.target.checked;
+    applyExtensionEnabled(e.target.checked);
+  });
+
+  // 自動翻訳警告
+  g('ks-auto').addEventListener('change', e => _ktToggleAutoWarn(e.target.checked));
+
+  // デバッグ行（h2を5回クリックで表示）
+  let _dc = 0;
+  g('kt-sp').querySelector('h2').addEventListener('click', () => {
+    if (++_dc >= 5) g('kt-sp-dbg').classList.add('on');
+  });
+
+  // プリセット選択
+  g('ks-preset').addEventListener('change', e => {
+    const id = e.target.value;
+    g('ks-pdel').disabled = !id;
+    if (!id) return;
+    chrome.storage.sync.get('configPresets', ({ configPresets = [] }) => {
+      const p = configPresets.find(p => p.id === id);
+      if (!p) return;
+      g('ks-url').value   = p.baseUrl;
+      g('ks-key').value   = p.apiKey;
+      g('ks-model').value = p.model;
+      chrome.storage.sync.set({ baseUrl: p.baseUrl, apiKey: p.apiKey, model: p.model, activePresetId: id });
+    });
+  });
+
+  // プリセット保存
+  g('ks-psave').addEventListener('click', () => {
+    const name    = g('ks-pname').value.trim();
+    const baseUrl = g('ks-url').value.trim();
+    const apiKey  = g('ks-key').value.trim();
+    const model   = g('ks-model').value.trim() || 'gpt-4o-mini';
+    if (!name) { alert('プリセット名を入力してください'); return; }
+    if (!baseUrl || !apiKey) { alert('Base URL と API Key を入力してください'); return; }
+    chrome.storage.sync.get('configPresets', ({ configPresets = [] }) => {
+      const id = Date.now().toString();
+      chrome.storage.sync.set({ configPresets: [...configPresets, { id, name, baseUrl, apiKey, model }] }, () => {
+        g('ks-pname').value = '';
+        _ktLoadPresets();
+        g('ks-preset').value = id;
+        g('ks-pdel').disabled = false;
+      });
+    });
+  });
+
+  // プリセット削除
+  g('ks-pdel').addEventListener('click', () => {
+    const sel = g('ks-preset');
+    const id   = sel.value;
+    const name = sel.selectedOptions[0]?.textContent;
+    if (!id) return;
+    if (!confirm(`「${name}」を削除しますか？`)) return;
+    chrome.storage.sync.get(['configPresets', 'activePresetId'], ({ configPresets = [], activePresetId }) => {
+      const updated = configPresets.filter(p => p.id !== id);
+      chrome.storage.sync.set(
+        { configPresets: updated, ...(activePresetId === id ? { activePresetId: '' } : {}) },
+        _ktLoadPresets
+      );
+    });
+  });
+
+  // 統計リセット
+  g('ks-sreset').addEventListener('click', () => {
+    if (!confirm('使用状況をリセットしますか？')) return;
+    chrome.storage.local.set({ stats: { requests: 0, promptTokens: 0, completionTokens: 0 } }, _ktLoadStats);
+  });
+
+  // 保存ボタン
+  g('ks-save').addEventListener('click', () => {
+    const baseUrl       = g('ks-url').value.trim();
+    const apiKey        = g('ks-key').value.trim();
+    const model         = g('ks-model').value.trim() || 'gpt-4o-mini';
+    const language      = g('ks-lang').value;
+    const maxContext    = parseInt(g('ks-ctx').value)  || 0;
+    const maxConcurrent = parseInt(g('ks-conc').value) || 3;
+    const autoTranslate = g('ks-auto').checked;
+    const debugMode     = g('ks-debug').checked;
+    const st = g('ks-st');
+    if (!baseUrl || !apiKey) {
+      st.textContent = 'Base URL と API Key は必須です';
+      st.className = 'st err';
+      return;
+    }
+    chrome.storage.sync.set({ baseUrl, apiKey, model, language, maxContext, maxConcurrent, autoTranslate, debugMode }, () => {
+      autoTranslateEnabled = autoTranslate;
+      autoTranslateMaxConcurrent = maxConcurrent;
+      st.textContent = '設定を保存しました';
+      st.className = 'st ok';
+      setTimeout(() => { st.textContent = ''; st.className = 'st'; }, 2000);
+    });
+  });
+}
+
+function _ktHidePanel() {
+  document.getElementById('kt-sp')?.remove();
+  const mainEl = document.querySelector('aside')?.parentElement?.querySelector('main');
+  if (mainEl) [...mainEl.children].forEach(el => { el.hidden = false; });
+}
+
+function _ktToggleAutoWarn(on) {
+  document.getElementById('ks-awarn')?.classList.toggle('on', on);
+}
+
+function _ktLoadPresets() {
+  chrome.storage.sync.get(['configPresets', 'activePresetId'], ({ configPresets = [], activePresetId = '' }) => {
+    const sel = document.getElementById('ks-preset');
+    if (!sel) return;
+    sel.innerHTML = '<option value="">— 選択して切り替え —</option>';
+    configPresets.forEach(p => {
+      const o = document.createElement('option');
+      o.value = p.id; o.textContent = p.name;
+      sel.appendChild(o);
+    });
+    sel.value = activePresetId;
+    const del = document.getElementById('ks-pdel');
+    if (del) del.disabled = !sel.value;
+  });
+}
+
+function _ktLoadStats() {
+  chrome.storage.local.get('stats', ({ stats = {} }) => {
+    const fmt = n => n >= 1e6 ? (n / 1e6).toFixed(1) + 'M' : n >= 1e3 ? (n / 1e3).toFixed(1) + 'K' : String(n);
+    const upd = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = fmt(v); };
+    upd('ks-sreq', stats.requests        || 0);
+    upd('ks-sin',  stats.promptTokens    || 0);
+    upd('ks-sout', stats.completionTokens || 0);
+  });
+}
+
+// 統計の自動更新（設定パネルが開いているとき）
+try {
+  chrome.storage.onChanged.addListener((changes, area) => {
+    if (area === 'local' && changes.stats) _ktLoadStats();
+  });
+} catch { /* ignore */ }
