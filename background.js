@@ -58,12 +58,14 @@ ${text}`;
 
   const endpoint = baseUrl.replace(/\/$/, '') + '/chat/completions';
 
+  const baseMessages = [
+    { role: 'system', content: systemPrompt },
+    { role: 'user', content: userPrompt },
+  ];
+
   const requestBody = {
     model: model || 'gpt-4o-mini',
-    messages: [
-      { role: 'system', content: systemPrompt },
-      { role: 'user', content: userPrompt },
-    ],
+    messages: baseMessages,
     temperature: 0.3,
     max_tokens: 300,
   };
@@ -76,16 +78,33 @@ ${text}`;
     console.log('[KT] model:', requestBody.model);
   }
 
-  const response = await fetch(endpoint, {
+  const fetchRequest = (body) => fetch(endpoint, {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${apiKey}`,
-    },
-    body: JSON.stringify(requestBody),
+    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${apiKey}` },
+    body: JSON.stringify(body),
   });
 
-  if (!response.ok) {
+  let response = await fetchRequest(requestBody);
+
+  // 400 INVALID_ARGUMENT: max_tokensやsystemロールが非対応のモデル向けフォールバック
+  if (response.status === 400) {
+    const errorText = await response.text();
+    if (debug) console.log('[KT] 400エラー、フォールバックリトライ:', errorText);
+
+    const fallbackBody = {
+      model: requestBody.model,
+      // systemロールをuserメッセージ先頭に統合
+      messages: [{ role: 'user', content: `${systemPrompt}\n\n${userPrompt}` }],
+      temperature: requestBody.temperature,
+      // max_tokensを除外
+    };
+    response = await fetchRequest(fallbackBody);
+
+    if (!response.ok) {
+      const fallbackError = await response.text();
+      throw new Error(`API エラー (${response.status}): ${fallbackError}`);
+    }
+  } else if (!response.ok) {
     const errorText = await response.text();
     throw new Error(`API エラー (${response.status}): ${errorText}`);
   }
