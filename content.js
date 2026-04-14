@@ -66,7 +66,7 @@ try {
 } catch { /* ignore */ }
 
 function drainAutoTranslate() {
-  while (autoTranslateActive < autoTranslateMaxConcurrent && autoTranslatePending.length > 0) {
+  while ((autoTranslateMaxConcurrent <= 0 || autoTranslateActive < autoTranslateMaxConcurrent) && autoTranslatePending.length > 0) {
     const btn = autoTranslatePending.shift();
     if (!document.body.contains(btn) || btn.classList.contains('kt-translated')) {
       continue; // 消えた・翻訳済みはスキップ
