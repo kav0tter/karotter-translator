@@ -1,5 +1,9 @@
 /* Karotter Translator - content.css */
 
+/* ===== 拡張機能無効時 ===== */
+.kt-disabled .kt-translate-btn-row,
+.kt-disabled .kt-compose-translate { display: none !important; }
+
 /* ===== 翻訳ボタン行（テキストとアクションバーの間） ===== */
 
 .kt-translate-btn-row {

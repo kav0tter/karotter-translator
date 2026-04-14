@@ -294,6 +294,27 @@
 
     #debugRow { display: none; }
     #debugRow.visible { display: flex; }
+
+    .master-toggle-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--surface-soft);
+      border: 1px solid var(--border-soft);
+      border-radius: 8px;
+      padding: 10px 12px;
+      cursor: pointer;
+      user-select: none;
+    }
+    .master-toggle-label {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+    .master-toggle-row input { display: none; }
+    .master-toggle-row .toggle-track { background: var(--neutral-200); }
+    .master-toggle-row input:checked ~ .toggle-track { background: var(--accent); }
+    .master-toggle-row input:checked ~ .toggle-track .toggle-thumb { transform: translateX(16px); }
   </style>
 </head>
 <body>
@@ -306,6 +327,14 @@
   </header>
 
   <main>
+    <label class="master-toggle-row">
+      <span class="master-toggle-label">翻訳機能を有効にする</span>
+      <input type="checkbox" id="enabled" />
+      <span class="toggle-track"><span class="toggle-thumb"></span></span>
+    </label>
+
+    <hr class="divider" />
+
     <div class="field">
       <label>プリセット</label>
       <div class="preset-select-row">

@@ -28,6 +28,31 @@ async function cacheSet(key, value) {
   } catch { /* ignore */ }
 }
 
+// ========== 拡張機能オン/オフ ==========
+
+let extensionEnabled = true;
+
+(async () => {
+  try {
+    const { enabled } = await chrome.storage.sync.get(['enabled']);
+    extensionEnabled = enabled ?? true;
+    applyExtensionEnabled(extensionEnabled);
+  } catch { /* ignore */ }
+})();
+
+function applyExtensionEnabled(val) {
+  document.body.classList.toggle('kt-disabled', !val);
+}
+
+try {
+  chrome.storage.onChanged.addListener((changes, area) => {
+    if (area === 'sync' && 'enabled' in changes) {
+      extensionEnabled = changes.enabled.newValue ?? true;
+      applyExtensionEnabled(extensionEnabled);
+    }
+  });
+} catch { /* ignore */ }
+
 // ========== 自動翻訳モード ==========
 
 let autoTranslateEnabled = false;
@@ -194,6 +219,7 @@ function getThreadContext(currentReactionBtn, maxContext) {
 // ========== 投稿一覧の翻訳ボタン ==========
 
 function injectTranslateButton(reactionBtn) {
+  if (!extensionEnabled) return;
   const container = getPostContainer(reactionBtn);
   if (!container || container.hasAttribute(PROCESSED_ATTR)) return;
   container.setAttribute(PROCESSED_ATTR, '1');
@@ -354,6 +380,7 @@ function buildLangOptions(langSelect, allLanguages, recentLanguages, selectedLan
 const COMPOSE_SUBMIT_LABELS = ['カロート', '返信', '引用カロート'];
 
 function injectComposeTranslateButton(root) {
+  if (!extensionEnabled) return;
   // rootはモーダルでもformでも可。formを基準に処理する
   const form = root.matches('form') ? root : root.querySelector('form');
   if (!form || form.hasAttribute(PROCESSED_ATTR)) return;
