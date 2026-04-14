@@ -33,6 +33,75 @@ document.getElementById('autoTranslate').addEventListener('change', (e) => {
   updateAutoTranslateWarning(e.target.checked);
 });
 
+// ========== プリセット ==========
+
+function loadPresets() {
+  chrome.storage.sync.get('configPresets', ({ configPresets = [] }) => {
+    const sel = document.getElementById('presetSelect');
+    const currentId = sel.value;
+    sel.innerHTML = '<option value="">— 選択して切り替え —</option>';
+    configPresets.forEach(p => {
+      const opt = document.createElement('option');
+      opt.value = p.id;
+      opt.textContent = p.name;
+      sel.appendChild(opt);
+    });
+    sel.value = currentId;
+    document.getElementById('presetDeleteBtn').disabled = !sel.value;
+  });
+}
+
+loadPresets();
+
+document.getElementById('presetSelect').addEventListener('change', (e) => {
+  const id = e.target.value;
+  document.getElementById('presetDeleteBtn').disabled = !id;
+  if (!id) return;
+
+  chrome.storage.sync.get('configPresets', ({ configPresets = [] }) => {
+    const preset = configPresets.find(p => p.id === id);
+    if (!preset) return;
+    document.getElementById('baseUrl').value = preset.baseUrl;
+    document.getElementById('apiKey').value  = preset.apiKey;
+    document.getElementById('model').value   = preset.model;
+    // 即時反映
+    chrome.storage.sync.set({ baseUrl: preset.baseUrl, apiKey: preset.apiKey, model: preset.model });
+  });
+});
+
+document.getElementById('presetSaveBtn').addEventListener('click', () => {
+  const name    = document.getElementById('presetName').value.trim();
+  const baseUrl = document.getElementById('baseUrl').value.trim();
+  const apiKey  = document.getElementById('apiKey').value.trim();
+  const model   = document.getElementById('model').value.trim() || 'gpt-4o-mini';
+
+  if (!name)    { alert('プリセット名を入力してください'); return; }
+  if (!baseUrl || !apiKey) { alert('Base URL と API Key を入力してください'); return; }
+
+  chrome.storage.sync.get('configPresets', ({ configPresets = [] }) => {
+    const id = Date.now().toString();
+    const updated = [...configPresets, { id, name, baseUrl, apiKey, model }];
+    chrome.storage.sync.set({ configPresets: updated }, () => {
+      document.getElementById('presetName').value = '';
+      loadPresets();
+      document.getElementById('presetSelect').value = id;
+      document.getElementById('presetDeleteBtn').disabled = false;
+    });
+  });
+});
+
+document.getElementById('presetDeleteBtn').addEventListener('click', () => {
+  const id   = document.getElementById('presetSelect').value;
+  const name = document.getElementById('presetSelect').selectedOptions[0]?.textContent;
+  if (!id) return;
+  if (!confirm(`「${name}」を削除しますか？`)) return;
+
+  chrome.storage.sync.get('configPresets', ({ configPresets = [] }) => {
+    const updated = configPresets.filter(p => p.id !== id);
+    chrome.storage.sync.set({ configPresets: updated }, loadPresets);
+  });
+});
+
 // ========== 使用状況 ==========
 
 function formatNumber(n) {
