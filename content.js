@@ -4,6 +4,29 @@ const PROCESSED_ATTR = 'data-kt-translated';
 
 // 翻訳キャッシュ（オリジナルテキスト → 翻訳結果）
 const translationCache = new Map();
+const CACHE_MAX_SIZE = 100;
+const CACHE_STORAGE_KEY = 'translationCache';
+
+// 起動時にキャッシュを復元
+(async () => {
+  try {
+    const { [CACHE_STORAGE_KEY]: saved } = await chrome.storage.local.get(CACHE_STORAGE_KEY);
+    if (Array.isArray(saved)) saved.forEach(([k, v]) => translationCache.set(k, v));
+  } catch { /* ignore */ }
+})();
+
+async function cacheSet(key, value) {
+  // 既存キーは一度削除して末尾（最新）に追加
+  translationCache.delete(key);
+  translationCache.set(key, value);
+  // 上限超えなら先頭（最古）を削除
+  if (translationCache.size > CACHE_MAX_SIZE) {
+    translationCache.delete(translationCache.keys().next().value);
+  }
+  try {
+    await chrome.storage.local.set({ [CACHE_STORAGE_KEY]: [...translationCache.entries()] });
+  } catch { /* ignore */ }
+}
 
 // ========== 自動翻訳モード ==========
 
@@ -209,7 +232,7 @@ function injectTranslateButton(reactionBtn) {
         const response = await sendMessageWithRetry({ type: 'TRANSLATE', payload });
         if (!response.success) throw new Error(response.error);
         result = response.data;
-        translationCache.set(currentText, result);
+        cacheSet(currentText, result);
 
         if (debugMode) {
           console.log('[KT] 翻訳レスポンス ─────────────────');
@@ -399,7 +422,7 @@ function injectComposeTranslateButton(root) {
         });
         if (!response.success) throw new Error(response.error);
         result = response.data;
-        if (!result.is_same_language) translationCache.set(cacheKey, result);
+        if (!result.is_same_language) cacheSet(cacheKey, result);
       }
 
       const { translated_text, is_same_language } = result;
