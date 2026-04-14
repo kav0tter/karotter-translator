@@ -806,7 +806,7 @@ ${text}`;
 
     tryInjectCompose(el);
 
-    if (window.location.pathname.startsWith('/settings')) injectKtSettingsNavItem();
+    if (window.location.pathname.startsWith('/settings')) injectKtSettings();
   }
 
   const observer = new MutationObserver(mutations => {
@@ -822,18 +822,18 @@ ${text}`;
   history.pushState = function (...args) {
     _origPushState(...args);
     setTimeout(() => {
-      if (window.location.pathname.startsWith('/settings')) injectKtSettingsNavItem();
+      if (window.location.pathname.startsWith('/settings')) injectKtSettings();
     }, 100);
   };
   window.addEventListener('popstate', () => {
-    if (window.location.pathname.startsWith('/settings')) setTimeout(injectKtSettingsNavItem, 100);
+    if (window.location.pathname.startsWith('/settings')) setTimeout(injectKtSettings, 100);
   });
 
   // 初回スキャン（SPAのレンダリング遅延に対応して複数回試行）
   function initialScan() {
     document.querySelectorAll('[aria-label="リアクションを追加"]').forEach(injectTranslateButton);
     document.querySelectorAll('form').forEach(f => injectComposeTranslateButton(f));
-    if (window.location.pathname.startsWith('/settings')) injectKtSettingsNavItem();
+    if (window.location.pathname.startsWith('/settings')) injectKtSettings();
   }
 
   initialScan();
@@ -843,6 +843,36 @@ ${text}`;
   // ===== /settings ページ統合 =====
 
   let _ktActive = false;
+
+  function injectKtSettings() {
+    injectKtSettingsNavItem();
+    injectKtSettingsMobileNavItem();
+  }
+
+  function injectKtSettingsMobileNavItem() {
+    if (!window.location.pathname.startsWith('/settings')) return;
+    if (document.getElementById('kt-mob-nav-btn')) return;
+    const mobileNav = [...document.querySelectorAll('nav')].find(n =>
+      n.className.includes('overflow-hidden') &&
+      n.className.includes('rounded-2xl') &&
+      n.parentElement?.className?.includes('p-4')
+    );
+    if (!mobileNav) {
+      setTimeout(injectKtSettingsMobileNavItem, 300);
+      return;
+    }
+
+    const btn = document.createElement('button');
+    btn.id = 'kt-mob-nav-btn';
+    btn.className = 'flex w-full items-center justify-between px-4 py-4 text-left transition-colors hover:bg-[var(--surface-soft)]';
+    btn.innerHTML = `<div class="min-w-0 pr-4"><div class="font-medium text-[var(--text-primary)]">Karotter Translator</div><div class="mt-1 text-xs text-[var(--text-muted)]">翻訳拡張機能の設定を管理します。</div></div><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;color:var(--text-muted)"><path d="m9 18 6-6-6-6"/></svg>`;
+    mobileNav.insertBefore(btn, mobileNav.firstChild);
+
+    btn.addEventListener('click', () => {
+      renderKtSettingsPanel();
+      document.querySelector('main')?.scrollIntoView({ behavior: 'smooth' });
+    });
+  }
 
   const _KT_LANGS = [
     '日本語', '英語', '中国語（簡体字）', '中国語（繁体字）',
@@ -899,7 +929,7 @@ ${text}`;
   }
 
   function renderKtSettingsPanel() {
-    const mainEl = document.querySelector('aside')?.parentElement?.querySelector('main');
+    const mainEl = document.querySelector('main');
     if (!mainEl) return;
 
     if (!document.getElementById('kt-sp-style')) {
@@ -1069,7 +1099,7 @@ ${text}`;
 
   function _ktHidePanel() {
     document.getElementById('kt-sp')?.remove();
-    const mainEl = document.querySelector('aside')?.parentElement?.querySelector('main');
+    const mainEl = document.querySelector('main');
     if (mainEl) [...mainEl.children].forEach(el => { el.hidden = false; });
   }
 
