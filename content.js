@@ -660,7 +660,10 @@ function injectKtSettingsNavItem() {
   if (!window.location.pathname.startsWith('/settings')) return;
   if (document.getElementById('kt-nav-btn')) return;
   const nav = document.querySelector('aside nav.flex.flex-col');
-  if (!nav) return;
+  if (!nav) {
+    setTimeout(injectKtSettingsNavItem, 300);
+    return;
+  }
 
   // 現在アクティブなボタンのクラスを取得してテーマに合わせる
   const existActive = [...nav.querySelectorAll('button')].find(b => b.className.includes('text-white'));

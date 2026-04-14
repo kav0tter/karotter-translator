@@ -841,7 +841,10 @@ ${text}`;
     if (!window.location.pathname.startsWith('/settings')) return;
     if (document.getElementById('kt-nav-btn')) return;
     const nav = document.querySelector('aside nav.flex.flex-col');
-    if (!nav) return;
+    if (!nav) {
+      setTimeout(injectKtSettingsNavItem, 300);
+      return;
+    }
 
     const existActive = [...nav.querySelectorAll('button')].find(b => b.className.includes('text-white'));
     const ACT_CLS = existActive?.className ?? '';
