@@ -22,36 +22,12 @@ try {
   });
 } catch { /* ignore */ }
 
-// 自動翻訳キュー（APIへの同時リクエストを1件ずつに制限）
-const autoTranslateQueue = [];
-let autoTranslateProcessing = false;
-
+// 自動翻訳（並列実行）
 function enqueueAutoTranslate(btn) {
   btn.dataset.ktAuto = '1'; // 自動翻訳起点であることを記録
-  autoTranslateQueue.push(btn);
-  if (!autoTranslateProcessing) processAutoTranslateQueue();
-}
-
-function processAutoTranslateQueue() {
-  const btn = autoTranslateQueue.shift();
-  if (!btn) { autoTranslateProcessing = false; return; }
-  autoTranslateProcessing = true;
-
-  // DOM から消えていたり既翻訳なら次へ
-  if (!document.body.contains(btn) || btn.classList.contains('kt-translated')) {
-    processAutoTranslateQueue();
-    return;
+  if (document.body.contains(btn) && !btn.classList.contains('kt-translated')) {
+    btn.click();
   }
-
-  btn.click();
-
-  // disabled が解除されるまで待って次をキック
-  const poll = setInterval(() => {
-    if (!btn.disabled) {
-      clearInterval(poll);
-      setTimeout(processAutoTranslateQueue, 300);
-    }
-  }, 100);
 }
 
 // ========== 投稿コンテナの特定 ==========
