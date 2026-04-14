@@ -10,7 +10,7 @@ document.getElementById('appHeader').addEventListener('click', () => {
   }
 });
 
-const KEYS = ['baseUrl', 'apiKey', 'model', 'language', 'maxContext', 'autoTranslate', 'debugMode'];
+const KEYS = ['baseUrl', 'apiKey', 'model', 'language', 'maxContext', 'maxConcurrent', 'autoTranslate', 'debugMode'];
 
 // 設定を読み込んでフォームに反映
 chrome.storage.sync.get(KEYS, (data) => {
@@ -19,6 +19,7 @@ chrome.storage.sync.get(KEYS, (data) => {
   document.getElementById('model').value      = data.model      || 'gpt-4o-mini';
   document.getElementById('language').value   = data.language   || '日本語';
   document.getElementById('maxContext').value      = data.maxContext    ?? 0;
+  document.getElementById('maxConcurrent').value   = data.maxConcurrent ?? 3;
   const autoTranslateEl = document.getElementById('autoTranslate');
   autoTranslateEl.checked = data.autoTranslate ?? false;
   updateAutoTranslateWarning(autoTranslateEl.checked);
@@ -136,6 +137,7 @@ document.getElementById('saveBtn').addEventListener('click', () => {
   const model      = document.getElementById('model').value.trim() || 'gpt-4o-mini';
   const language   = document.getElementById('language').value;
   const maxContext    = parseInt(document.getElementById('maxContext').value) || 0;
+  const maxConcurrent = parseInt(document.getElementById('maxConcurrent').value) || 3;
   const autoTranslate = document.getElementById('autoTranslate').checked;
   const debugMode     = document.getElementById('debugMode').checked;
 
@@ -147,7 +149,7 @@ document.getElementById('saveBtn').addEventListener('click', () => {
     return;
   }
 
-  chrome.storage.sync.set({ baseUrl, apiKey, model, language, maxContext, autoTranslate, debugMode }, () => {
+  chrome.storage.sync.set({ baseUrl, apiKey, model, language, maxContext, maxConcurrent, autoTranslate, debugMode }, () => {
     statusEl.textContent = '設定を保存しました';
     statusEl.className = 'status success';
     setTimeout(() => { statusEl.className = 'status'; }, 2000);

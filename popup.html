@@ -350,6 +350,12 @@
     </div>
 
     <div class="field">
+      <label for="maxConcurrent">自動翻訳の同時実行数</label>
+      <input type="number" id="maxConcurrent" min="1" max="10" placeholder="3" />
+      <span class="hint">一度に並列翻訳する最大数（APIのレートリミットに合わせて調整）</span>
+    </div>
+
+    <div class="field">
       <label for="language">翻訳先デフォルト言語</label>
       <select id="language">
         <option value="日本語">日本語</option>

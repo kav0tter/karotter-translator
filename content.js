@@ -45,12 +45,49 @@ try {
   });
 } catch { /* ignore */ }
 
-// 自動翻訳（並列実行）
-function enqueueAutoTranslate(btn) {
-  btn.dataset.ktAuto = '1'; // 自動翻訳起点であることを記録
-  if (document.body.contains(btn) && !btn.classList.contains('kt-translated')) {
+// 自動翻訳（同時実行数制限付き）
+let autoTranslateMaxConcurrent = 3;
+let autoTranslateActive = 0;
+const autoTranslatePending = [];
+
+(async () => {
+  try {
+    const { maxConcurrent } = await chrome.storage.sync.get(['maxConcurrent']);
+    autoTranslateMaxConcurrent = maxConcurrent ?? 3;
+  } catch { /* ignore */ }
+})();
+
+try {
+  chrome.storage.onChanged.addListener((changes, area) => {
+    if (area === 'sync' && changes.maxConcurrent) {
+      autoTranslateMaxConcurrent = changes.maxConcurrent.newValue ?? 3;
+    }
+  });
+} catch { /* ignore */ }
+
+function drainAutoTranslate() {
+  while (autoTranslateActive < autoTranslateMaxConcurrent && autoTranslatePending.length > 0) {
+    const btn = autoTranslatePending.shift();
+    if (!document.body.contains(btn) || btn.classList.contains('kt-translated')) {
+      continue; // 消えた・翻訳済みはスキップ
+    }
+    autoTranslateActive++;
     btn.click();
+    // disabled が解除されたらスロット返却
+    const poll = setInterval(() => {
+      if (!btn.disabled) {
+        clearInterval(poll);
+        autoTranslateActive--;
+        drainAutoTranslate();
+      }
+    }, 100);
   }
+}
+
+function enqueueAutoTranslate(btn) {
+  btn.dataset.ktAuto = '1';
+  autoTranslatePending.push(btn);
+  drainAutoTranslate();
 }
 
 // ========== 投稿コンテナの特定 ==========
