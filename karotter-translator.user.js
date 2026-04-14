@@ -817,6 +817,18 @@ ${text}`;
 
   observer.observe(document.body, { childList: true, subtree: true });
 
+  // SPA ナビゲーション検知（history.pushState をインターセプト）
+  const _origPushState = history.pushState.bind(history);
+  history.pushState = function (...args) {
+    _origPushState(...args);
+    setTimeout(() => {
+      if (window.location.pathname.startsWith('/settings')) injectKtSettingsNavItem();
+    }, 100);
+  };
+  window.addEventListener('popstate', () => {
+    if (window.location.pathname.startsWith('/settings')) setTimeout(injectKtSettingsNavItem, 100);
+  });
+
   // 初回スキャン（SPAのレンダリング遅延に対応して複数回試行）
   function initialScan() {
     document.querySelectorAll('[aria-label="リアクションを追加"]').forEach(injectTranslateButton);
