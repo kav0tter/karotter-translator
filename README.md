@@ -3,7 +3,9 @@
 ![version](https://img.shields.io/badge/version-1.0.0-blue?style=flat-square)
 ![manifest](https://img.shields.io/badge/manifest-v3-brightgreen?style=flat-square)
 ![license](https://img.shields.io/github/license/kav0tter/karotter-translator?style=flat-square)
-![platform](https://img.shields.io/badge/platform-Chrome-yellow?style=flat-square&logo=googlechrome&logoColor=white)
+![Chrome](https://img.shields.io/badge/Chrome-拡張機能-yellow?style=flat-square&logo=googlechrome&logoColor=white)
+![Firefox](https://img.shields.io/badge/Firefox-Userscript-orange?style=flat-square&logo=firefox&logoColor=white)
+![Safari](https://img.shields.io/badge/Safari-Userscript-blue?style=flat-square&logo=safari&logoColor=white)
 ![karotter studio](https://img.shields.io/badge/karotter_studio-compatible-blueviolet?style=flat-square)
 
 **[karotter.com](https://karotter.com) をそのまま多言語で読み書きするChrome拡張 / Userscript。**
@@ -78,10 +80,21 @@ git clone https://github.com/kav0tter/karotter-translator.git
 3. **「パッケージ化されていない拡張機能を読み込む」** をクリック
 4. クローン/展開したフォルダを選択
 
-### Userscript（Tampermonkey / Violentmonkey）
+### Userscript（Firefox / Safari / Chrome）
 
-1. Tampermonkey または Violentmonkey をインストール
-2. `karotter-translator.user.js` をブラウザで開くか、マネージャーから直接インポート
+Firefox・Safari・その他のブラウザでも Userscript として動作します。自動更新に対応しているため、一度インストールすれば以降は手動更新不要です。
+
+| ブラウザ | 推奨マネージャー |
+|---|---|
+| Firefox | [Tampermonkey](https://addons.mozilla.org/ja/firefox/addon/tampermonkey/) / [Violentmonkey](https://addons.mozilla.org/ja/firefox/addon/violentmonkey/) |
+| Safari | [Userscripts](https://apps.apple.com/jp/app/userscripts/id1463298887) |
+| Chrome | [Tampermonkey](https://chromewebstore.google.com/detail/tampermonkey/dhdgffkkebhmkfjojejmpbldmpobfkfo) |
+
+マネージャーをインストール後、以下のURLをブラウザで開くとインストールダイアログが表示されます：
+
+```
+https://raw.githubusercontent.com/kav0tter/karotter-translator/master/karotter-translator.user.js
+```
 
 ---
 
@@ -112,9 +125,8 @@ git clone https://github.com/kav0tter/karotter-translator.git
 
 ## Roadmap
 
-- [ ] Firefox対応
 - [ ] Chrome Web Store公開
-- [ ] Firefox Add-ons公開
+- [ ] Firefox Add-ons公開（拡張機能版）
 
 ---
 
