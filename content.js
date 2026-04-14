@@ -649,9 +649,13 @@ document.querySelectorAll('form').forEach(f => injectComposeTranslateButton(f));
 const _ktOrigPushState = history.pushState.bind(history);
 history.pushState = function (...args) {
   _ktOrigPushState(...args);
+  if (!window.location.pathname.startsWith('/settings')) _ktHidePanel();
   setTimeout(_ktInitialSettingsScan, 100);
 };
-window.addEventListener('popstate', () => setTimeout(_ktInitialSettingsScan, 100));
+window.addEventListener('popstate', () => {
+  if (!window.location.pathname.startsWith('/settings')) _ktHidePanel();
+  setTimeout(_ktInitialSettingsScan, 100);
+});
 
 // ========== /settings ページ統合 ==========
 
@@ -679,6 +683,10 @@ function _ktDoInjectMobileNavBtn(mobileNav) {
   btn.addEventListener('click', () => {
     renderKtSettingsPanel();
     document.querySelector('main')?.scrollIntoView({ behavior: 'smooth' });
+  });
+  // 他のナビボタンをクリックしたらパネルを閉じる
+  [...mobileNav.querySelectorAll('button:not(#kt-mob-nav-btn)')].forEach(b => {
+    b.addEventListener('click', () => _ktHidePanel());
   });
 }
 
