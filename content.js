@@ -645,17 +645,6 @@ observer.observe(document.body, { childList: true, subtree: true });
 document.querySelectorAll('[aria-label="リアクションを追加"]').forEach(injectTranslateButton);
 // 初期表示のインラインform（投稿詳細ページ）
 document.querySelectorAll('form').forEach(f => injectComposeTranslateButton(f));
-// /settings ページ（複数回試行）
-function _ktInitialSettingsScan() {
-  if (window.location.pathname.startsWith('/settings')) {
-    injectKtSettingsNavItem();
-    injectKtSettingsMobileNavItem();
-  }
-}
-_ktInitialSettingsScan();
-setTimeout(_ktInitialSettingsScan, 500);
-setTimeout(_ktInitialSettingsScan, 1500);
-
 // SPA ナビゲーション検知
 const _ktOrigPushState = history.pushState.bind(history);
 history.pushState = function (...args) {
@@ -666,7 +655,8 @@ window.addEventListener('popstate', () => setTimeout(_ktInitialSettingsScan, 100
 
 // ========== /settings ページ統合 ==========
 
-let _ktActive = false; // KT設定タブがアクティブかどうか
+let _ktActive = false;
+let _ktMobNavObserver = null;
 
 const _KT_LANGS = [
   '日本語', '英語', '中国語（簡体字）', '中国語（繁体字）',
@@ -674,8 +664,6 @@ const _KT_LANGS = [
   'イタリア語', 'ポルトガル語', 'ロシア語', 'アラビア語',
   'ヒンディー語', 'タイ語', 'ベトナム語', 'インドネシア語',
 ];
-
-let _ktMobNavObserver = null;
 
 function _ktFindMobileNav() {
   return document.querySelector('div.p-4 > nav');
@@ -716,6 +704,16 @@ function injectKtSettingsMobileNavItem() {
   _ktMobNavObserver.observe(document.body, { childList: true, subtree: true });
   setTimeout(() => { _ktMobNavObserver?.disconnect(); _ktMobNavObserver = null; }, 10000);
 }
+
+function _ktInitialSettingsScan() {
+  if (window.location.pathname.startsWith('/settings')) {
+    injectKtSettingsNavItem();
+    injectKtSettingsMobileNavItem();
+  }
+}
+_ktInitialSettingsScan();
+setTimeout(_ktInitialSettingsScan, 500);
+setTimeout(_ktInitialSettingsScan, 1500);
 
 function injectKtSettingsNavItem() {
   if (!window.location.pathname.startsWith('/settings')) return;
