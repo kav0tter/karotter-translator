@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="ja">
+<html>
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Karotter Translator 設定</title>
+  <title data-i18n="popupTitle">Karotter Translator 設定</title>
   <style>
     :root {
       --accent:       #2563eb;
@@ -328,7 +328,7 @@
 
   <main>
     <label class="master-toggle-row">
-      <span class="master-toggle-label">翻訳機能を有効にする</span>
+      <span class="master-toggle-label" data-i18n="enableTranslation">翻訳機能を有効にする</span>
       <input type="checkbox" id="enabled" />
       <span class="toggle-track"><span class="toggle-thumb"></span></span>
     </label>
@@ -336,18 +336,18 @@
     <hr class="divider" />
 
     <div class="field">
-      <label>プリセット</label>
+      <label data-i18n="preset">プリセット</label>
       <div class="preset-select-row">
         <select id="presetSelect">
-          <option value="">— 選択して切り替え —</option>
+          <option value="" data-i18n="presetSelectPlaceholder">— 選択して切り替え —</option>
         </select>
-        <button class="preset-delete-btn" id="presetDeleteBtn" title="削除" disabled>
+        <button class="preset-delete-btn" id="presetDeleteBtn" data-i18n-title="delete" title="削除" disabled>
           <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
         </button>
       </div>
       <div class="preset-save-row">
-        <input type="text" id="presetName" placeholder="プリセット名を入力して保存" />
-        <button class="preset-save-btn" id="presetSaveBtn">保存</button>
+        <input type="text" id="presetName" data-i18n-placeholder="presetNamePlaceholder" placeholder="プリセット名を入力して保存" />
+        <button class="preset-save-btn" id="presetSaveBtn" data-i18n="save">保存</button>
       </div>
     </div>
 
@@ -356,7 +356,7 @@
     <div class="field">
       <label for="baseUrl">Base URL</label>
       <input type="url" id="baseUrl" placeholder="https://api.openai.com/v1" />
-      <span class="hint">OpenAI互換APIのエンドポイント</span>
+      <span class="hint" data-i18n="baseUrlHint">OpenAI互換APIのエンドポイント</span>
     </div>
 
     <div class="field">
@@ -365,51 +365,51 @@
     </div>
 
     <div class="model-field">
-      <label for="model">モデル</label>
+      <label for="model" data-i18n="modelLabel">モデル</label>
       <input type="text" id="model" placeholder="gpt-4o-mini" />
-      <span class="hint">使用するモデルID（例: gpt-4o, gemma-3-27b-it）</span>
+      <span class="hint" data-i18n="modelHint">使用するモデルID（例: gpt-4o, gemma-3-27b-it）</span>
     </div>
 
     <hr class="divider" />
 
     <div class="field">
-      <label for="maxContext">スレッドコンテキスト取得数</label>
+      <label for="maxContext" data-i18n="threadContextCount">スレッドコンテキスト取得数</label>
       <input type="number" id="maxContext" min="0" placeholder="0" />
-      <span class="hint">返信翻訳時に遡る投稿数（0 = 無制限）</span>
+      <span class="hint" data-i18n="threadContextHint">返信翻訳時に遡る投稿数（0 = 無制限）</span>
     </div>
 
     <div class="field">
-      <label for="maxConcurrent">自動翻訳の同時実行数</label>
+      <label for="maxConcurrent" data-i18n="maxConcurrentLabel">自動翻訳の同時実行数</label>
       <input type="number" id="maxConcurrent" min="-1" max="10" placeholder="3" />
-      <span class="hint">一度に並列翻訳する最大数（0 以下 = 無制限）</span>
+      <span class="hint" data-i18n="maxConcurrentHint">一度に並列翻訳する最大数（0 以下 = 無制限）</span>
     </div>
 
     <div class="field">
-      <label for="language">翻訳先デフォルト言語</label>
+      <label for="language" data-i18n="defaultTargetLang">翻訳先デフォルト言語</label>
       <select id="language">
-        <option value="日本語">日本語</option>
-        <option value="英語">英語</option>
-        <option value="中国語（簡体字）">中国語（簡体字）</option>
-        <option value="中国語（繁体字）">中国語（繁体字）</option>
-        <option value="韓国語">韓国語</option>
-        <option value="フランス語">フランス語</option>
-        <option value="スペイン語">スペイン語</option>
-        <option value="ドイツ語">ドイツ語</option>
-        <option value="イタリア語">イタリア語</option>
-        <option value="ポルトガル語">ポルトガル語</option>
-        <option value="ロシア語">ロシア語</option>
-        <option value="アラビア語">アラビア語</option>
-        <option value="タイ語">タイ語</option>
-        <option value="ベトナム語">ベトナム語</option>
-        <option value="インドネシア語">インドネシア語</option>
+        <option value="日本語" data-i18n="lang_ja">日本語</option>
+        <option value="英語" data-i18n="lang_en">英語</option>
+        <option value="中国語（簡体字）" data-i18n="lang_zh_CN">中国語（簡体字）</option>
+        <option value="中国語（繁体字）" data-i18n="lang_zh_TW">中国語（繁体字）</option>
+        <option value="韓国語" data-i18n="lang_ko">韓国語</option>
+        <option value="フランス語" data-i18n="lang_fr">フランス語</option>
+        <option value="スペイン語" data-i18n="lang_es">スペイン語</option>
+        <option value="ドイツ語" data-i18n="lang_de">ドイツ語</option>
+        <option value="イタリア語" data-i18n="lang_it">イタリア語</option>
+        <option value="ポルトガル語" data-i18n="lang_pt">ポルトガル語</option>
+        <option value="ロシア語" data-i18n="lang_ru">ロシア語</option>
+        <option value="アラビア語" data-i18n="lang_ar">アラビア語</option>
+        <option value="タイ語" data-i18n="lang_th">タイ語</option>
+        <option value="ベトナム語" data-i18n="lang_vi">ベトナム語</option>
+        <option value="インドネシア語" data-i18n="lang_id">インドネシア語</option>
       </select>
-      <span class="hint">投稿一覧の「翻訳」ボタンで使う言語</span>
+      <span class="hint" data-i18n="defaultTargetLangHint">投稿一覧の「翻訳」ボタンで使う言語</span>
     </div>
 
     <hr class="divider" />
 
     <label class="toggle-row" id="autoTranslateRow">
-      <span class="toggle-label">自動翻訳モード</span>
+      <span class="toggle-label" data-i18n="autoTranslateMode">自動翻訳モード</span>
       <input type="checkbox" id="autoTranslate" />
       <span class="toggle-track"><span class="toggle-thumb"></span></span>
     </label>
@@ -418,36 +418,48 @@
         <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/>
         <path d="M12 9v4"/><path d="M12 17h.01"/>
       </svg>
-      <span>投稿が表示されるたびに自動で翻訳します。表示中の全投稿がAPIを呼び出すため、コストが大幅に増加する場合があります。</span>
+      <span data-i18n="autoTranslateWarning">投稿が表示されるたびに自動で翻訳します。表示中の全投稿がAPIを呼び出すため、コストが大幅に増加する場合があります。</span>
     </div>
 
     <hr class="divider" id="debugDivider" style="display:none" />
 
     <label class="toggle-row" id="debugRow">
-      <span class="toggle-label">デバッグモード</span>
+      <span class="toggle-label" data-i18n="debugMode">デバッグモード</span>
       <input type="checkbox" id="debugMode" />
       <span class="toggle-track"><span class="toggle-thumb"></span></span>
     </label>
 
     <div class="stats-card">
       <div class="stats-header">
-        <span class="stats-title">使用状況</span>
-        <button class="stats-reset-btn" id="statsResetBtn">リセット</button>
+        <span class="stats-title" data-i18n="usageStats">使用状況</span>
+        <button class="stats-reset-btn" id="statsResetBtn" data-i18n="reset">リセット</button>
       </div>
       <div class="stats-grid">
         <div class="stats-item">
           <span class="stats-value" id="statsRequests">—</span>
-          <span class="stats-label">リクエスト数</span>
+          <span class="stats-label" data-i18n="requests">リクエスト数</span>
         </div>
         <div class="stats-item">
           <span class="stats-value" id="statsPrompt">—</span>
-          <span class="stats-label">入力トークン</span>
+          <span class="stats-label" data-i18n="inputTokens">入力トークン</span>
         </div>
         <div class="stats-item">
           <span class="stats-value" id="statsCompletion">—</span>
-          <span class="stats-label">出力トークン</span>
+          <span class="stats-label" data-i18n="outputTokens">出力トークン</span>
         </div>
       </div>
+    </div>
+
+    <hr class="divider" />
+
+    <div class="field">
+      <label for="uiLanguage" data-i18n="uiLanguageLabel">表示言語</label>
+      <select id="uiLanguage">
+        <option value="auto" data-i18n="uiLanguageAuto">システム言語</option>
+        <option value="ja">日本語</option>
+        <option value="en">English</option>
+      </select>
+      <span class="hint" data-i18n="uiLanguageHint">拡張機能UIの表示言語</span>
     </div>
 
     <button class="save-btn" id="saveBtn">
@@ -456,7 +468,7 @@
         <polyline points="17 21 17 13 7 13 7 21"/>
         <polyline points="7 3 7 8 15 8"/>
       </svg>
-      設定を保存
+      <span data-i18n="saveSettings">設定を保存</span>
     </button>
 
     <div class="status" id="status"></div>

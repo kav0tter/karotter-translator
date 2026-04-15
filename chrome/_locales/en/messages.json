@@ -1,0 +1,165 @@
+{
+  "extDescription": {
+    "message": "Chrome extension to translate karotter.com posts with LLM"
+  },
+  "popupTitle": {
+    "message": "Karotter Translator Settings"
+  },
+  "uiLanguageLabel": {
+    "message": "Display language"
+  },
+  "uiLanguageAuto": {
+    "message": "System language"
+  },
+  "uiLanguageHint": {
+    "message": "Language for extension UI"
+  },
+  "enableTranslation": {
+    "message": "Enable Translation"
+  },
+  "preset": {
+    "message": "Preset"
+  },
+  "presetSelectPlaceholder": {
+    "message": "— Select to switch —"
+  },
+  "presetNamePlaceholder": {
+    "message": "Enter preset name to save"
+  },
+  "save": {
+    "message": "Save"
+  },
+  "delete": {
+    "message": "Delete"
+  },
+  "apiSettings": {
+    "message": "API Settings"
+  },
+  "baseUrlHint": {
+    "message": "OpenAI-compatible API endpoint"
+  },
+  "modelLabel": {
+    "message": "Model"
+  },
+  "modelHint": {
+    "message": "Model ID to use (e.g. gpt-4o, gemma-3-27b-it)"
+  },
+  "translationSettings": {
+    "message": "Translation Settings"
+  },
+  "defaultTargetLang": {
+    "message": "Default target language"
+  },
+  "defaultTargetLangHint": {
+    "message": "Language used by the \"Translate\" button in post list"
+  },
+  "threadContextCount": {
+    "message": "Thread context count"
+  },
+  "threadContextHint": {
+    "message": "Posts to look back when translating replies (0 = unlimited)"
+  },
+  "maxConcurrentLabel": {
+    "message": "Auto-translate concurrency"
+  },
+  "maxConcurrentHint": {
+    "message": "Max parallel translations at once (0 or less = unlimited)"
+  },
+  "options": {
+    "message": "Options"
+  },
+  "autoTranslateMode": {
+    "message": "Auto-translate mode"
+  },
+  "autoTranslateWarning": {
+    "message": "Automatically translates every post as it appears. All visible posts call the API, which may significantly increase costs."
+  },
+  "debugMode": {
+    "message": "Debug mode"
+  },
+  "usageStats": {
+    "message": "Usage"
+  },
+  "reset": {
+    "message": "Reset"
+  },
+  "requests": {
+    "message": "Requests"
+  },
+  "inputTokens": {
+    "message": "Input tokens"
+  },
+  "outputTokens": {
+    "message": "Output tokens"
+  },
+  "saveSettings": {
+    "message": "Save settings"
+  },
+  "translateBtn": {
+    "message": "Translate"
+  },
+  "translateAndReplace": {
+    "message": "Translate & replace"
+  },
+  "translatingBtn": {
+    "message": "Translating..."
+  },
+  "revertBtn": {
+    "message": "Revert"
+  },
+  "panelSubtitle": {
+    "message": "Manage translation extension settings."
+  },
+  "targetLangTitle": {
+    "message": "Target language"
+  },
+  "alertPresetName": {
+    "message": "Please enter a preset name"
+  },
+  "alertBaseUrlApiKey": {
+    "message": "Please enter Base URL and API Key"
+  },
+  "confirmDeletePreset": {
+    "message": "Delete \"$NAME$\"?",
+    "placeholders": {
+      "name": { "content": "$1" }
+    }
+  },
+  "confirmResetStats": {
+    "message": "Reset usage statistics?"
+  },
+  "errorBaseUrlApiKey": {
+    "message": "Base URL and API Key are required"
+  },
+  "successSaveSettings": {
+    "message": "Settings saved"
+  },
+  "toastSameLanguage": {
+    "message": "Skipped: source and target language are the same"
+  },
+  "toastTranslateError": {
+    "message": "Translation error: $ERROR$",
+    "placeholders": {
+      "error": { "content": "$1" }
+    }
+  },
+  "errorNotConfigured": {
+    "message": "Setup incomplete. Please configure the extension via its icon."
+  },
+  "lang_ja": { "message": "Japanese" },
+  "lang_en": { "message": "English" },
+  "lang_zh_CN": { "message": "Chinese (Simplified)" },
+  "lang_zh_TW": { "message": "Chinese (Traditional)" },
+  "lang_ko": { "message": "Korean" },
+  "lang_fr": { "message": "French" },
+  "lang_es": { "message": "Spanish" },
+  "lang_de": { "message": "German" },
+  "lang_it": { "message": "Italian" },
+  "lang_pt": { "message": "Portuguese" },
+  "lang_ru": { "message": "Russian" },
+  "lang_ar": { "message": "Arabic" },
+  "lang_hi": { "message": "Hindi" },
+  "lang_th": { "message": "Thai" },
+  "lang_vi": { "message": "Vietnamese" },
+  "lang_id": { "message": "Indonesian" }
+}

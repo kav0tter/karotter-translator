@@ -21,7 +21,7 @@ async function handleTranslate({ text, targetLanguage, sourceLanguage, context, 
   ]);
 
   if (!baseUrl || !apiKey) {
-    throw new Error('設定が未完了です。拡張機能のアイコンから設定を行ってください。');
+    throw new Error(chrome.i18n.getMessage('errorNotConfigured'));
   }
 
   const target = targetLanguage || language || '日本語';
@@ -120,18 +120,18 @@ ${text}`;
   const content = data.choices?.[0]?.message?.content;
 
   if (!content) {
-    throw new Error('APIから空のレスポンスが返されました');
+    throw new Error('API returned an empty response');
   }
 
   let parsed;
   try {
     parsed = JSON.parse(content);
   } catch {
-    throw new Error('APIレスポンスのJSONパースに失敗しました');
+    throw new Error('Failed to parse API response as JSON');
   }
 
   if (typeof parsed.translated_text !== 'string') {
-    throw new Error('APIレスポンスの形式が不正です');
+    throw new Error('Unexpected API response format');
   }
 
   // トークン使用量を累積保存

@@ -2,7 +2,8 @@
   "manifest_version": 3,
   "name": "Karotter Translator",
   "version": "1.0.0",
-  "description": "karotter.comの投稿をLLMで翻訳するChrome拡張",
+  "description": "__MSG_extDescription__",
+  "default_locale": "ja",
   "permissions": ["storage", "sidePanel"],
   "host_permissions": [
     "https://karotter.com/*",

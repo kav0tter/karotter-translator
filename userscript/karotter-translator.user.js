@@ -19,6 +19,146 @@
 (function () {
   'use strict';
 
+  // ===== i18n =====
+
+  const _messages = {
+    ja: {
+      enableTranslation:       '翻訳機能を有効にする',
+      preset:                  'プリセット',
+      presetSelectPlaceholder: '— 選択して切り替え —',
+      presetNamePlaceholder:   'プリセット名を入力して保存',
+      save:                    '保存',
+      delete:                  '削除',
+      apiSettings:             'API設定',
+      baseUrlHint:             'OpenAI互換APIのエンドポイント',
+      modelLabel:              'モデル',
+      modelHint:               '使用するモデルID（例: gpt-4o, gemma-3-27b-it）',
+      translationSettings:     '翻訳設定',
+      defaultTargetLang:       '翻訳先デフォルト言語',
+      defaultTargetLangHint:   '投稿一覧の「翻訳」ボタンで使う言語',
+      threadContextCount:      'スレッドコンテキスト取得数',
+      threadContextHint:       '返信翻訳時に遡る投稿数（0 = 無制限）',
+      maxConcurrentLabel:      '自動翻訳の同時実行数',
+      maxConcurrentHint:       '一度に並列翻訳する最大数（0 以下 = 無制限）',
+      options:                 'オプション',
+      autoTranslateMode:       '自動翻訳モード',
+      autoTranslateWarning:    '投稿が表示されるたびに自動で翻訳します。表示中の全投稿がAPIを呼び出すため、コストが大幅に増加する場合があります。',
+      debugMode:               'デバッグモード',
+      usageStats:              '使用状況',
+      reset:                   'リセット',
+      requests:                'リクエスト数',
+      inputTokens:             '入力トークン',
+      outputTokens:            '出力トークン',
+      saveSettings:            '設定を保存',
+      translateBtn:            '翻訳',
+      translateAndReplace:     '翻訳して置換',
+      translatingBtn:          '翻訳中...',
+      revertBtn:               '元に戻す',
+      panelSubtitle:           '翻訳拡張機能の設定を管理します。',
+      targetLangTitle:         '翻訳先言語',
+      alertPresetName:         'プリセット名を入力してください',
+      alertBaseUrlApiKey:      'Base URL と API Key を入力してください',
+      confirmDeletePreset:     '「$1」を削除しますか？',
+      confirmResetStats:       '使用状況をリセットしますか？',
+      errorBaseUrlApiKey:      'Base URL と API Key は必須です',
+      successSaveSettings:     '設定を保存しました',
+      toastSameLanguage:       '同じ言語のため翻訳をスキップしました',
+      toastTranslateError:     '翻訳エラー: $1',
+      errorNotConfigured:      '設定が未完了です。設定ページの「Karotter Translator」から設定を行ってください。',
+      lang_ja:   '日本語',   lang_en:    '英語',
+      lang_zh_CN:'中国語（簡体字）', lang_zh_TW:'中国語（繁体字）',
+      lang_ko:   '韓国語',   lang_fr:    'フランス語',
+      lang_es:   'スペイン語', lang_de:   'ドイツ語',
+      lang_it:   'イタリア語', lang_pt:   'ポルトガル語',
+      lang_ru:   'ロシア語', lang_ar:    'アラビア語',
+      lang_hi:   'ヒンディー語', lang_th: 'タイ語',
+      lang_vi:   'ベトナム語', lang_id:   'インドネシア語',
+      uiLanguageLabel: '表示言語',
+      uiLanguageAuto:  'システム言語',
+      uiLanguageHint:  '拡張機能UIの表示言語',
+    },
+    en: {
+      enableTranslation:       'Enable Translation',
+      preset:                  'Preset',
+      presetSelectPlaceholder: '— Select to switch —',
+      presetNamePlaceholder:   'Enter preset name to save',
+      save:                    'Save',
+      delete:                  'Delete',
+      apiSettings:             'API Settings',
+      baseUrlHint:             'OpenAI-compatible API endpoint',
+      modelLabel:              'Model',
+      modelHint:               'Model ID to use (e.g. gpt-4o, gemma-3-27b-it)',
+      translationSettings:     'Translation Settings',
+      defaultTargetLang:       'Default target language',
+      defaultTargetLangHint:   'Language used by the "Translate" button in post list',
+      threadContextCount:      'Thread context count',
+      threadContextHint:       'Posts to look back when translating replies (0 = unlimited)',
+      maxConcurrentLabel:      'Auto-translate concurrency',
+      maxConcurrentHint:       'Max parallel translations at once (0 or less = unlimited)',
+      options:                 'Options',
+      autoTranslateMode:       'Auto-translate mode',
+      autoTranslateWarning:    'Automatically translates every post as it appears. All visible posts call the API, which may significantly increase costs.',
+      debugMode:               'Debug mode',
+      usageStats:              'Usage',
+      reset:                   'Reset',
+      requests:                'Requests',
+      inputTokens:             'Input tokens',
+      outputTokens:            'Output tokens',
+      saveSettings:            'Save settings',
+      translateBtn:            'Translate',
+      translateAndReplace:     'Translate & replace',
+      translatingBtn:          'Translating...',
+      revertBtn:               'Revert',
+      panelSubtitle:           'Manage translation extension settings.',
+      targetLangTitle:         'Target language',
+      alertPresetName:         'Please enter a preset name',
+      alertBaseUrlApiKey:      'Please enter Base URL and API Key',
+      confirmDeletePreset:     'Delete "$1"?',
+      confirmResetStats:       'Reset usage statistics?',
+      errorBaseUrlApiKey:      'Base URL and API Key are required',
+      successSaveSettings:     'Settings saved',
+      toastSameLanguage:       'Skipped: source and target language are the same',
+      toastTranslateError:     'Translation error: $1',
+      errorNotConfigured:      'Setup incomplete. Please configure from the "Karotter Translator" section in Settings.',
+      lang_ja:   'Japanese',    lang_en:    'English',
+      lang_zh_CN:'Chinese (Simplified)', lang_zh_TW:'Chinese (Traditional)',
+      lang_ko:   'Korean',      lang_fr:    'French',
+      lang_es:   'Spanish',     lang_de:    'German',
+      lang_it:   'Italian',     lang_pt:    'Portuguese',
+      lang_ru:   'Russian',     lang_ar:    'Arabic',
+      lang_hi:   'Hindi',       lang_th:    'Thai',
+      lang_vi:   'Vietnamese',  lang_id:    'Indonesian',
+      uiLanguageLabel: 'Display language',
+      uiLanguageAuto:  'System language',
+      uiLanguageHint:  'Language for extension UI',
+    },
+  };
+
+  function _getLocale(uiLanguage) {
+    if (uiLanguage === 'ja' || uiLanguage === 'en') return uiLanguage;
+    return (navigator.language || 'ja').startsWith('ja') ? 'ja' : 'en';
+  }
+
+  let _locale = _getLocale(GM_getValue('uiLanguage', 'auto'));
+  function _t(key, sub) {
+    let msg = _messages[_locale]?.[key] ?? _messages.ja[key] ?? key;
+    if (sub !== undefined) msg = msg.replace('$1', sub);
+    return msg;
+  }
+
+  const LANG_I18N_KEYS = {
+    '日本語': 'lang_ja', '英語': 'lang_en',
+    '中国語（簡体字）': 'lang_zh_CN', '中国語（繁体字）': 'lang_zh_TW',
+    '韓国語': 'lang_ko', 'フランス語': 'lang_fr', 'スペイン語': 'lang_es',
+    'ドイツ語': 'lang_de', 'イタリア語': 'lang_it', 'ポルトガル語': 'lang_pt',
+    'ロシア語': 'lang_ru', 'アラビア語': 'lang_ar', 'ヒンディー語': 'lang_hi',
+    'タイ語': 'lang_th', 'ベトナム語': 'lang_vi', 'インドネシア語': 'lang_id',
+  };
+  function getLangDisplay(jaName) {
+    const key = LANG_I18N_KEYS[jaName];
+    return (key && _t(key)) || jaName;
+  }
+
   // ===== CSS =====
 
   const _style = document.createElement('style');
@@ -345,7 +485,7 @@
     const language = getSetting('language', '日本語');
 
     if (!baseUrl || !apiKey) {
-      throw new Error('設定が未完了です。設定ページの「Karotter Translator」から設定を行ってください。');
+      throw new Error(_t('errorNotConfigured'));
     }
 
     const target = targetLanguage || language || '日本語';
@@ -437,17 +577,17 @@ ${text}`;
     const data = await response.json();
     const content = data.choices?.[0]?.message?.content;
 
-    if (!content) throw new Error('APIから空のレスポンスが返されました');
+    if (!content) throw new Error('API returned an empty response');
 
     let parsed;
     try {
       parsed = JSON.parse(content);
     } catch {
-      throw new Error('APIレスポンスのJSONパースに失敗しました');
+      throw new Error('Failed to parse API response as JSON');
     }
 
     if (typeof parsed.translated_text !== 'string') {
-      throw new Error('APIレスポンスの形式が不正です');
+      throw new Error('Unexpected API response format');
     }
 
     if (debug) {
@@ -490,7 +630,7 @@ ${text}`;
     const btn = document.createElement('button');
     btn.type = 'button';
     btn.className = 'kt-translate-btn';
-    btn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m5 8 6 6"/><path d="m4 14 6-6 2-3"/><path d="M2 5h12"/><path d="M7 2h1"/><path d="m22 22-5-10-5 10"/><path d="M14 18h6"/></svg><span class="kt-btn-label">翻訳</span>`;
+    btn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m5 8 6 6"/><path d="m4 14 6-6 2-3"/><path d="M2 5h12"/><path d="M7 2h1"/><path d="m22 22-5-10-5 10"/><path d="M14 18h6"/></svg><span class="kt-btn-label">${_t('translateBtn')}</span>`;
 
     btnRow.appendChild(btn);
     textEl.insertAdjacentElement('beforebegin', btnRow);
@@ -507,7 +647,7 @@ ${text}`;
       if (isTranslated) {
         textEl.innerHTML = originalText;
         isTranslated = false;
-        btn.querySelector('.kt-btn-label').textContent = '翻訳';
+        btn.querySelector('.kt-btn-label').textContent = _t('translateBtn');
         btn.classList.remove('kt-translated');
         return;
       }
@@ -516,7 +656,7 @@ ${text}`;
       if (!currentText) return;
 
       btn.disabled = true;
-      btn.querySelector('.kt-btn-label').textContent = '翻訳中...';
+      btn.querySelector('.kt-btn-label').textContent = _t('translatingBtn');
 
       try {
         let result = translationCache.get(currentText);
@@ -534,7 +674,7 @@ ${text}`;
           }
 
           if (debugMode && context.length > 0) {
-            btn.querySelector('.kt-btn-label').textContent = `翻訳中... [ctx:${context.length}]`;
+            btn.querySelector('.kt-btn-label').textContent = `${_t('translatingBtn')} [ctx:${context.length}]`;
           }
 
           result = await handleTranslate({
@@ -557,8 +697,8 @@ ${text}`;
         const { translated_text, is_same_language, source_language, target_language } = result;
 
         if (is_same_language) {
-          if (!btn.dataset.ktAuto) showToast('同じ言語のため翻訳をスキップしました');
-          btn.querySelector('.kt-btn-label').textContent = '翻訳';
+          if (!btn.dataset.ktAuto) showToast(_t('toastSameLanguage'));
+          btn.querySelector('.kt-btn-label').textContent = _t('translateBtn');
           btn.disabled = false;
           return;
         }
@@ -567,11 +707,11 @@ ${text}`;
         textEl.innerHTML = escapeHtml(translated_text);
         isTranslated = true;
 
-        btn.querySelector('.kt-btn-label').textContent = `${source_language} → ${target_language} · 元に戻す`;
+        btn.querySelector('.kt-btn-label').textContent = `${source_language} → ${target_language} · ${_t('revertBtn')}`;
         btn.classList.add('kt-translated');
       } catch (err) {
-        showToast(`翻訳エラー: ${err.message}`, 'error');
-        btn.querySelector('.kt-btn-label').textContent = '翻訳';
+        showToast(_t('toastTranslateError', err.message), 'error');
+        btn.querySelector('.kt-btn-label').textContent = _t('translateBtn');
       } finally {
         btn.disabled = false;
       }
@@ -599,7 +739,7 @@ ${text}`;
       recentLanguages.forEach(lang => {
         const opt = document.createElement('option');
         opt.value = lang;
-        opt.textContent = lang;
+        opt.textContent = getLangDisplay(lang);
         langSelect.appendChild(opt);
       });
       const sep = document.createElement('option');
@@ -611,7 +751,7 @@ ${text}`;
     allLanguages.forEach(lang => {
       const opt = document.createElement('option');
       opt.value = lang;
-      opt.textContent = lang;
+      opt.textContent = getLangDisplay(lang);
       langSelect.appendChild(opt);
     });
 
@@ -648,7 +788,7 @@ ${text}`;
 
     const langSelect = document.createElement('select');
     langSelect.className = 'kt-lang-select';
-    langSelect.title = '翻訳先言語';
+    langSelect.title = _t('targetLangTitle');
 
     const recent = getRecentLanguages();
     const language = getSetting('language', '日本語');
@@ -659,7 +799,7 @@ ${text}`;
     const translateBtn = document.createElement('button');
     translateBtn.type = 'button';
     translateBtn.className = 'kt-compose-translate-btn';
-    const btnInner = () => `<svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m5 8 6 6"/><path d="m4 14 6-6 2-3"/><path d="M2 5h12"/><path d="M7 2h1"/><path d="m22 22-5-10-5 10"/><path d="M14 18h6"/></svg> 翻訳して置換`;
+    const btnInner = () => `<svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m5 8 6 6"/><path d="m4 14 6-6 2-3"/><path d="M2 5h12"/><path d="M7 2h1"/><path d="m22 22-5-10-5 10"/><path d="M14 18h6"/></svg> ${_t('translateAndReplace')}`;
     translateBtn.innerHTML = btnInner();
 
     let originalText = null;
@@ -682,7 +822,7 @@ ${text}`;
       if (!text) return;
 
       translateBtn.disabled = true;
-      translateBtn.textContent = '翻訳中...';
+      translateBtn.textContent = _t('translatingBtn');
 
       try {
         const maxContext = getSetting('maxContext', 0);
@@ -708,7 +848,7 @@ ${text}`;
 
         if (debugMode && context.length > 0) {
           console.log('[KT] 返信コンテキスト:', context.length + '件', context);
-          translateBtn.textContent = `翻訳中... [ctx:${context.length}]`;
+          translateBtn.textContent = `${_t('translatingBtn')} [ctx:${context.length}]`;
         }
 
         const cacheKey = `${text}::${langSelect.value}`;
@@ -721,21 +861,21 @@ ${text}`;
         const { translated_text, is_same_language } = result;
 
         if (is_same_language) {
-          showToast('同じ言語のため翻訳をスキップしました');
+          showToast(_t('toastSameLanguage'));
           return;
         }
 
         originalText = text;
         isTranslated = true;
         setNativeValue(textarea, translated_text);
-        translateBtn.textContent = '元に戻す';
+        translateBtn.textContent = _t('revertBtn');
         translateBtn.classList.add('kt-translated');
 
         const usedLang = langSelect.value;
         saveRecentLanguage(usedLang);
         buildLangOptions(langSelect, LANGUAGES, getRecentLanguages(), usedLang);
       } catch (err) {
-        showToast(`翻訳エラー: ${err.message}`, 'error');
+        showToast(_t('toastTranslateError', err.message), 'error');
         translateBtn.innerHTML = btnInner();
       } finally {
         translateBtn.disabled = false;
@@ -847,7 +987,7 @@ ${text}`;
     const btn = document.createElement('button');
     btn.id = 'kt-mob-nav-btn';
     btn.className = 'flex w-full items-center justify-between px-4 py-4 text-left transition-colors hover:bg-[var(--surface-soft)]';
-    btn.innerHTML = `<div class="min-w-0 pr-4"><div class="font-medium text-[var(--text-primary)]">Karotter Translator</div><div class="mt-1 text-xs text-[var(--text-muted)]">翻訳拡張機能の設定を管理します。</div></div><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;color:var(--text-muted)"><path d="m9 18 6-6-6-6"/></svg>`;
+    btn.innerHTML = `<div class="min-w-0 pr-4"><div class="font-medium text-[var(--text-primary)]">Karotter Translator</div><div class="mt-1 text-xs text-[var(--text-muted)]">${_t('panelSubtitle')}</div></div><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;color:var(--text-muted)"><path d="m9 18 6-6-6-6"/></svg>`;
     mobileNav.insertBefore(btn, mobileNav.firstChild);
     btn.addEventListener('click', () => {
       renderKtSettingsPanel();
@@ -931,7 +1071,7 @@ ${text}`;
 
     const btn = document.createElement('button');
     btn.id = 'kt-nav-btn';
-    btn.innerHTML = `<div class="font-semibold">Karotter Translator</div><div id="kt-nav-sub" class="${INACT_SUB}">翻訳拡張機能の設定を管理します。</div>`;
+    btn.innerHTML = `<div class="font-semibold">Karotter Translator</div><div id="kt-nav-sub" class="${INACT_SUB}">${_t('panelSubtitle')}</div>`;
     nav.insertBefore(btn, nav.firstChild);
 
     const setActive = (active) => {
@@ -1037,86 +1177,86 @@ div.p-4:has(#kt-sp)>*:not(#kt-sp),aside+*:has(#kt-sp)>*:not(#kt-sp),._kt-sub-hid
     const _panel = document.createElement('div');
     _panel.id = 'kt-sp';
 
-    const lo = _KT_LANGS.map(l => `<option value="${l}">${l}</option>`).join('');
+    const lo = _KT_LANGS.map(l => `<option value="${l}">${getLangDisplay(l)}</option>`).join('');
     _panel.innerHTML = `
   <h2>Karotter Translator</h2>
-  <p class="sub">翻訳拡張機能の設定を管理します。</p>
+  <p class="sub">${_t('panelSubtitle')}</p>
 
   <label class="master">
-    <span class="master-lbl">翻訳機能を有効にする</span>
+    <span class="master-lbl">${_t('enableTranslation')}</span>
     <input type="checkbox" id="ks-en">
     <span class="trk"><span class="thm"></span></span>
   </label>
 
   <div class="card">
-    <div class="sec">プリセット</div>
+    <div class="sec">${_t('preset')}</div>
     <div class="field">
       <div class="row">
-        <select id="ks-preset"><option value="">— 選択して切り替え —</option></select>
-        <button class="icn" id="ks-pdel" title="削除" disabled>
+        <select id="ks-preset"><option value="">${_t('presetSelectPlaceholder')}</option></select>
+        <button class="icn" id="ks-pdel" title="${_t('delete')}" disabled>
           <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
         </button>
       </div>
     </div>
     <div class="field">
       <div class="row">
-        <input type="text" id="ks-pname" placeholder="プリセット名を入力して保存">
-        <button class="sbtn" id="ks-psave">保存</button>
+        <input type="text" id="ks-pname" placeholder="${_t('presetNamePlaceholder')}">
+        <button class="sbtn" id="ks-psave">${_t('save')}</button>
       </div>
     </div>
   </div>
 
   <div class="card">
-    <div class="sec">API設定</div>
+    <div class="sec">${_t('apiSettings')}</div>
     <div class="field">
       <label class="lbl" for="ks-url">Base URL</label>
       <input type="url" id="ks-url" placeholder="https://api.openai.com/v1">
-      <span class="hint">OpenAI互換APIのエンドポイント</span>
+      <span class="hint">${_t('baseUrlHint')}</span>
     </div>
     <div class="field">
       <label class="lbl" for="ks-key">API Key</label>
       <input type="password" id="ks-key" placeholder="sk-...">
     </div>
     <div class="field">
-      <label class="lbl" for="ks-model">モデル</label>
+      <label class="lbl" for="ks-model">${_t('modelLabel')}</label>
       <input type="text" id="ks-model" placeholder="gpt-4o-mini">
-      <span class="hint">使用するモデルID（例: gpt-4o, gemma-3-27b-it）</span>
+      <span class="hint">${_t('modelHint')}</span>
     </div>
   </div>
 
   <div class="card">
-    <div class="sec">翻訳設定</div>
+    <div class="sec">${_t('translationSettings')}</div>
     <div class="field">
-      <label class="lbl" for="ks-lang">翻訳先デフォルト言語</label>
+      <label class="lbl" for="ks-lang">${_t('defaultTargetLang')}</label>
       <select id="ks-lang">${lo}</select>
-      <span class="hint">投稿一覧の「翻訳」ボタンで使う言語</span>
+      <span class="hint">${_t('defaultTargetLangHint')}</span>
     </div>
     <div class="field">
-      <label class="lbl" for="ks-ctx">スレッドコンテキスト取得数</label>
+      <label class="lbl" for="ks-ctx">${_t('threadContextCount')}</label>
       <input type="number" id="ks-ctx" min="0" placeholder="0">
-      <span class="hint">返信翻訳時に遡る投稿数（0 = 無制限）</span>
+      <span class="hint">${_t('threadContextHint')}</span>
     </div>
     <div class="field">
-      <label class="lbl" for="ks-conc">自動翻訳の同時実行数</label>
+      <label class="lbl" for="ks-conc">${_t('maxConcurrentLabel')}</label>
       <input type="number" id="ks-conc" min="-1" max="10" placeholder="3">
-      <span class="hint">一度に並列翻訳する最大数（0 以下 = 無制限）</span>
+      <span class="hint">${_t('maxConcurrentHint')}</span>
     </div>
   </div>
 
   <div class="card">
-    <div class="sec">オプション</div>
+    <div class="sec">${_t('options')}</div>
     <label class="tog">
-      <span>自動翻訳モード</span>
+      <span>${_t('autoTranslateMode')}</span>
       <input type="checkbox" id="ks-auto">
       <span class="trk"><span class="thm"></span></span>
     </label>
     <div class="warn" id="ks-awarn">
       <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0;margin-top:1px"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>
-      <span>投稿が表示されるたびに自動で翻訳します。表示中の全投稿がAPIを呼び出すため、コストが大幅に増加する場合があります。</span>
+      <span>${_t('autoTranslateWarning')}</span>
     </div>
     <hr>
     <label class="tog" id="kt-sp-dbg">
-      <span>デバッグモード</span>
+      <span>${_t('debugMode')}</span>
       <input type="checkbox" id="ks-debug">
       <span class="trk"><span class="thm"></span></span>
     </label>
@@ -1124,19 +1264,31 @@ div.p-4:has(#kt-sp)>*:not(#kt-sp),aside+*:has(#kt-sp)>*:not(#kt-sp),._kt-sub-hid
 
   <div class="card">
     <div class="shdr">
-      <div class="sec" style="margin:0">使用状況</div>
-      <button class="rstbtn" id="ks-sreset">リセット</button>
+      <div class="sec" style="margin:0">${_t('usageStats')}</div>
+      <button class="rstbtn" id="ks-sreset">${_t('reset')}</button>
     </div>
     <div class="sgrid">
-      <div><div class="sv" id="ks-sreq">—</div><div class="sl">リクエスト数</div></div>
-      <div><div class="sv" id="ks-sin">—</div><div class="sl">入力トークン</div></div>
-      <div><div class="sv" id="ks-sout">—</div><div class="sl">出力トークン</div></div>
+      <div><div class="sv" id="ks-sreq">—</div><div class="sl">${_t('requests')}</div></div>
+      <div><div class="sv" id="ks-sin">—</div><div class="sl">${_t('inputTokens')}</div></div>
+      <div><div class="sv" id="ks-sout">—</div><div class="sl">${_t('outputTokens')}</div></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="field">
+      <label class="lbl" for="ks-uilang">${_t('uiLanguageLabel')}</label>
+      <select id="ks-uilang">
+        <option value="auto">${_t('uiLanguageAuto')}</option>
+        <option value="ja">日本語</option>
+        <option value="en">English</option>
+      </select>
+      <span class="hint">${_t('uiLanguageHint')}</span>
     </div>
   </div>
 
   <button class="savbtn" id="ks-save">
     <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
-    設定を保存
+    ${_t('saveSettings')}
   </button>
   <div class="st" id="ks-st"></div>
 `;
@@ -1200,6 +1352,7 @@ div.p-4:has(#kt-sp)>*:not(#kt-sp),aside+*:has(#kt-sp)>*:not(#kt-sp),._kt-sub-hid
     g('ks-auto').checked  = d.autoTranslate;
     g('ks-debug').checked = getSetting('debugMode', false);
     if (getSetting('debugMode', false)) g('kt-sp-dbg').classList.add('on');
+    g('ks-uilang').value  = getSetting('uiLanguage', 'auto');
     _ktToggleAutoWarn(d.autoTranslate);
 
     _ktLoadPresets();
@@ -1213,6 +1366,13 @@ div.p-4:has(#kt-sp)>*:not(#kt-sp),aside+*:has(#kt-sp)>*:not(#kt-sp),._kt-sub-hid
     });
 
     g('ks-auto').addEventListener('change', e => _ktToggleAutoWarn(e.target.checked));
+
+    // 表示言語の即時切り替え
+    g('ks-uilang').addEventListener('change', e => {
+      const val = e.target.value;
+      setSetting('uiLanguage', val);
+      _locale = _getLocale(val);
+    });
 
     // デバッグ行（h2を5回クリックで表示）
     let _dc = 0;
@@ -1243,8 +1403,8 @@ div.p-4:has(#kt-sp)>*:not(#kt-sp),aside+*:has(#kt-sp)>*:not(#kt-sp),._kt-sub-hid
       const baseUrl = g('ks-url').value.trim();
       const apiKey  = g('ks-key').value.trim();
       const model   = g('ks-model').value.trim() || 'gpt-4o-mini';
-      if (!name) { alert('プリセット名を入力してください'); return; }
-      if (!baseUrl || !apiKey) { alert('Base URL と API Key を入力してください'); return; }
+      if (!name) { alert(_t('alertPresetName')); return; }
+      if (!baseUrl || !apiKey) { alert(_t('alertBaseUrlApiKey')); return; }
       const presets = getSetting('configPresets', []);
       const id = Date.now().toString();
       setSetting('configPresets', [...presets, { id, name, baseUrl, apiKey, model }]);
@@ -1260,7 +1420,7 @@ div.p-4:has(#kt-sp)>*:not(#kt-sp),aside+*:has(#kt-sp)>*:not(#kt-sp),._kt-sub-hid
       const id   = sel.value;
       const name = sel.selectedOptions[0]?.textContent;
       if (!id) return;
-      if (!confirm(`「${name}」を削除しますか？`)) return;
+      if (!confirm(_t('confirmDeletePreset', name))) return;
       const presets = getSetting('configPresets', []);
       setSetting('configPresets', presets.filter(p => p.id !== id));
       if (getSetting('activePresetId', '') === id) setSetting('activePresetId', '');
@@ -1269,7 +1429,7 @@ div.p-4:has(#kt-sp)>*:not(#kt-sp),aside+*:has(#kt-sp)>*:not(#kt-sp),._kt-sub-hid
 
     // 統計リセット
     g('ks-sreset').addEventListener('click', () => {
-      if (!confirm('使用状況をリセットしますか？')) return;
+      if (!confirm(_t('confirmResetStats'))) return;
       setSetting('stats', { requests: 0, promptTokens: 0, completionTokens: 0 });
       _ktRefreshStats();
     });
@@ -1284,9 +1444,10 @@ div.p-4:has(#kt-sp)>*:not(#kt-sp),aside+*:has(#kt-sp)>*:not(#kt-sp),._kt-sub-hid
       const maxConcurrent = parseInt(g('ks-conc').value) || 3;
       const autoTranslate = g('ks-auto').checked;
       const debugMode     = g('ks-debug').checked;
+      const uiLanguage    = g('ks-uilang').value;
       const st = g('ks-st');
       if (!baseUrl || !apiKey) {
-        st.textContent = 'Base URL と API Key は必須です';
+        st.textContent = _t('errorBaseUrlApiKey');
         st.className = 'st err';
         return;
       }
@@ -1298,9 +1459,11 @@ div.p-4:has(#kt-sp)>*:not(#kt-sp),aside+*:has(#kt-sp)>*:not(#kt-sp),._kt-sub-hid
       setSetting('maxConcurrent', maxConcurrent);
       setSetting('autoTranslate', autoTranslate);
       setSetting('debugMode', debugMode);
+      setSetting('uiLanguage', uiLanguage);
+      _locale = _getLocale(uiLanguage);
       autoTranslateEnabled = autoTranslate;
       autoTranslateMaxConcurrent = maxConcurrent;
-      st.textContent = '設定を保存しました';
+      st.textContent = _t('successSaveSettings');
       st.className = 'st ok';
       setTimeout(() => { st.textContent = ''; st.className = 'st'; }, 2000);
     });
@@ -1315,7 +1478,7 @@ div.p-4:has(#kt-sp)>*:not(#kt-sp),aside+*:has(#kt-sp)>*:not(#kt-sp),._kt-sub-hid
     if (!sel) return;
     const presets = getSetting('configPresets', []);
     const active  = getSetting('activePresetId', '');
-    sel.innerHTML = '<option value="">— 選択して切り替え —</option>';
+    sel.innerHTML = `<option value="">${_t('presetSelectPlaceholder')}</option>`;
     presets.forEach(p => {
       const o = document.createElement('option');
       o.value = p.id; o.textContent = p.name;

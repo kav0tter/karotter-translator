@@ -1,0 +1,165 @@
+{
+  "extDescription": {
+    "message": "karotter.comの投稿をLLMで翻訳するChrome拡張"
+  },
+  "popupTitle": {
+    "message": "Karotter Translator 設定"
+  },
+  "uiLanguageLabel": {
+    "message": "表示言語"
+  },
+  "uiLanguageAuto": {
+    "message": "システム言語"
+  },
+  "uiLanguageHint": {
+    "message": "拡張機能UIの表示言語"
+  },
+  "enableTranslation": {
+    "message": "翻訳機能を有効にする"
+  },
+  "preset": {
+    "message": "プリセット"
+  },
+  "presetSelectPlaceholder": {
+    "message": "— 選択して切り替え —"
+  },
+  "presetNamePlaceholder": {
+    "message": "プリセット名を入力して保存"
+  },
+  "save": {
+    "message": "保存"
+  },
+  "delete": {
+    "message": "削除"
+  },
+  "apiSettings": {
+    "message": "API設定"
+  },
+  "baseUrlHint": {
+    "message": "OpenAI互換APIのエンドポイント"
+  },
+  "modelLabel": {
+    "message": "モデル"
+  },
+  "modelHint": {
+    "message": "使用するモデルID（例: gpt-4o, gemma-3-27b-it）"
+  },
+  "translationSettings": {
+    "message": "翻訳設定"
+  },
+  "defaultTargetLang": {
+    "message": "翻訳先デフォルト言語"
+  },
+  "defaultTargetLangHint": {
+    "message": "投稿一覧の「翻訳」ボタンで使う言語"
+  },
+  "threadContextCount": {
+    "message": "スレッドコンテキスト取得数"
+  },
+  "threadContextHint": {
+    "message": "返信翻訳時に遡る投稿数（0 = 無制限）"
+  },
+  "maxConcurrentLabel": {
+    "message": "自動翻訳の同時実行数"
+  },
+  "maxConcurrentHint": {
+    "message": "一度に並列翻訳する最大数（0 以下 = 無制限）"
+  },
+  "options": {
+    "message": "オプション"
+  },
+  "autoTranslateMode": {
+    "message": "自動翻訳モード"
+  },
+  "autoTranslateWarning": {
+    "message": "投稿が表示されるたびに自動で翻訳します。表示中の全投稿がAPIを呼び出すため、コストが大幅に増加する場合があります。"
+  },
+  "debugMode": {
+    "message": "デバッグモード"
+  },
+  "usageStats": {
+    "message": "使用状況"
+  },
+  "reset": {
+    "message": "リセット"
+  },
+  "requests": {
+    "message": "リクエスト数"
+  },
+  "inputTokens": {
+    "message": "入力トークン"
+  },
+  "outputTokens": {
+    "message": "出力トークン"
+  },
+  "saveSettings": {
+    "message": "設定を保存"
+  },
+  "translateBtn": {
+    "message": "翻訳"
+  },
+  "translateAndReplace": {
+    "message": "翻訳して置換"
+  },
+  "translatingBtn": {
+    "message": "翻訳中..."
+  },
+  "revertBtn": {
+    "message": "元に戻す"
+  },
+  "panelSubtitle": {
+    "message": "翻訳拡張機能の設定を管理します。"
+  },
+  "targetLangTitle": {
+    "message": "翻訳先言語"
+  },
+  "alertPresetName": {
+    "message": "プリセット名を入力してください"
+  },
+  "alertBaseUrlApiKey": {
+    "message": "Base URL と API Key を入力してください"
+  },
+  "confirmDeletePreset": {
+    "message": "「$NAME$」を削除しますか？",
+    "placeholders": {
+      "name": { "content": "$1" }
+    }
+  },
+  "confirmResetStats": {
+    "message": "使用状況をリセットしますか？"
+  },
+  "errorBaseUrlApiKey": {
+    "message": "Base URL と API Key は必須です"
+  },
+  "successSaveSettings": {
+    "message": "設定を保存しました"
+  },
+  "toastSameLanguage": {
+    "message": "同じ言語のため翻訳をスキップしました"
+  },
+  "toastTranslateError": {
+    "message": "翻訳エラー: $ERROR$",
+    "placeholders": {
+      "error": { "content": "$1" }
+    }
+  },
+  "errorNotConfigured": {
+    "message": "設定が未完了です。拡張機能のアイコンから設定を行ってください。"
+  },
+  "lang_ja": { "message": "日本語" },
+  "lang_en": { "message": "英語" },
+  "lang_zh_CN": { "message": "中国語（簡体字）" },
+  "lang_zh_TW": { "message": "中国語（繁体字）" },
+  "lang_ko": { "message": "韓国語" },
+  "lang_fr": { "message": "フランス語" },
+  "lang_es": { "message": "スペイン語" },
+  "lang_de": { "message": "ドイツ語" },
+  "lang_it": { "message": "イタリア語" },
+  "lang_pt": { "message": "ポルトガル語" },
+  "lang_ru": { "message": "ロシア語" },
+  "lang_ar": { "message": "アラビア語" },
+  "lang_hi": { "message": "ヒンディー語" },
+  "lang_th": { "message": "タイ語" },
+  "lang_vi": { "message": "ベトナム語" },
+  "lang_id": { "message": "インドネシア語" }
+}
