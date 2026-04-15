@@ -682,7 +682,6 @@ function _ktDoInjectMobileNavBtn(mobileNav) {
   mobileNav.insertBefore(btn, mobileNav.firstChild);
   btn.addEventListener('click', () => {
     renderKtSettingsPanel();
-    document.querySelector('main')?.scrollIntoView({ behavior: 'smooth' });
   });
   // 他のナビボタンをクリックしたらパネルを閉じる
   [...mobileNav.querySelectorAll('button:not(#kt-mob-nav-btn)')].forEach(b => {
@@ -774,7 +773,24 @@ function injectKtSettingsNavItem() {
 }
 
 function renderKtSettingsPanel() {
-  const container = document.querySelector('div.p-4') ?? document.querySelector('main');
+  // 再レンダリング前にクリーンアップ
+  document.querySelectorAll('._kt-sub-hide').forEach(el => el.classList.remove('_kt-sub-hide'));
+  document.getElementById('kt-sticky-hdr')?.remove();
+
+  // モバイル vs PC でコンテナを切り替える
+  // モバイル: div.p-4（div.w-full.md:hidden 内、モバイルのみ可視）
+  // PC: aside nav の隣の設定コンテンツエリア
+  const p4 = document.querySelector('div.p-4');
+  const isMobile = !!(p4 && p4.getBoundingClientRect().height > 0);
+
+  let container;
+  if (isMobile) {
+    container = p4;
+  } else {
+    const settingsNav = document.querySelector('aside nav.flex.flex-col');
+    const aside = settingsNav?.closest('aside');
+    container = aside?.nextElementSibling ?? document.querySelector('main');
+  }
   if (!container) return;
   const mainEl = container;
 
@@ -783,7 +799,7 @@ function renderKtSettingsPanel() {
     const s = document.createElement('style');
     s.id = 'kt-sp-style';
     s.textContent = `
-main:has(#kt-sp)>*:not(#kt-sp),div.p-4:has(#kt-sp)>*:not(#kt-sp){display:none!important}#kt-sp{padding:24px;max-width:560px}
+div.p-4:has(#kt-sp)>*:not(#kt-sp),aside+*:has(#kt-sp)>*:not(#kt-sp),._kt-sub-hide{display:none!important}#kt-sp{padding:24px;max-width:560px}
 #kt-sp h2{font-size:18px;font-weight:700;color:var(--text-primary);margin:0 0 4px}
 #kt-sp .sub{font-size:13px;color:var(--text-muted);margin:0 0 20px}
 #kt-sp .card{background:var(--surface-card,#fff);border:1px solid var(--border-soft);border-radius:12px;padding:16px 20px;margin-bottom:14px}
@@ -939,6 +955,32 @@ main:has(#kt-sp)>*:not(#kt-sp),div.p-4:has(#kt-sp)>*:not(#kt-sp){display:none!im
   <div class="st" id="ks-st"></div>`;
   mainEl.appendChild(_panel);
 
+  // モバイルのみ: stickyヘッダー・サブページ非表示・スクロールトップ
+  if (isMobile) {
+    if (!document.getElementById('kt-sticky-hdr')) {
+      const hdr = document.createElement('div');
+      hdr.id = 'kt-sticky-hdr';
+      hdr.className = 'sticky top-0 z-10 border-b border-[var(--border-soft)] bg-[color-mix(in_srgb,var(--surface-card)_92%,transparent)] px-4 py-4 backdrop-blur';
+      hdr.innerHTML = `<div class="flex w-full items-center gap-3"><button id="kt-sticky-back" class="rounded-full p-2 text-[var(--text-secondary)] transition hover:bg-[var(--surface-soft)] hover:text-[var(--text-primary)]"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg></button><div class="min-w-0"><h1 class="text-lg font-semibold text-[var(--text-primary)] md:text-xl">Karotter Translator</h1></div></div>`;
+      mainEl.parentElement.insertBefore(hdr, mainEl);
+      document.getElementById('kt-sticky-back').addEventListener('click', _ktHidePanel);
+    }
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+
+    // サブページ（プロフィール等）が開いていたら隠す
+    const minHScreen = mainEl.closest('[class*="min-h-screen"]');
+    if (minHScreen) {
+      const anchor = [...minHScreen.children].find(c => c.contains(mainEl));
+      if (anchor) {
+        let sib = anchor.nextElementSibling;
+        while (sib) {
+          sib.classList.add('_kt-sub-hide');
+          sib = sib.nextElementSibling;
+        }
+      }
+    }
+  }
+
   initKtSettingsForm();
 }
 
@@ -1065,6 +1107,8 @@ function initKtSettingsForm() {
 }
 
 function _ktHidePanel() {
+  document.querySelectorAll('._kt-sub-hide').forEach(el => el.classList.remove('_kt-sub-hide'));
+  document.getElementById('kt-sticky-hdr')?.remove();
   document.getElementById('kt-sp')?.remove();
 }
 
