@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Karotter Translator
 // @namespace    https://karotter.com/
-// @version      1.1.9
+// @version      1.2.0
 // @description  karotter.comの投稿をLLMで翻訳するユーザースクリプト
 // @author       kav0tter
 // @match        https://karotter.com/*
@@ -147,14 +147,7 @@
     }
 
   `;
-  function _ktInjectStyle() {
-    (document.head || document.documentElement).appendChild(_style);
-  }
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', _ktInjectStyle, { once: true });
-  } else {
-    _ktInjectStyle();
-  }
+  (document.head || document.documentElement).appendChild(_style);
 
   // ===== 設定ストレージ =====
 
@@ -822,15 +815,7 @@ ${text}`;
     }
   });
 
-  function _ktStartObserving() {
-    const target = document.body ?? document.documentElement;
-    if (target) observer.observe(target, { childList: true, subtree: true });
-  }
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', _ktStartObserving, { once: true });
-  } else {
-    _ktStartObserving();
-  }
+  observer.observe(document.body, { childList: true, subtree: true });
 
   // SPA ナビゲーション検知（history.pushState をインターセプト）
   const _origPushState = history.pushState.bind(history);
