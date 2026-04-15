@@ -831,26 +831,9 @@ ${text}`;
     if (window.location.pathname.startsWith('/settings')) setTimeout(injectKtSettings, 100);
   });
 
-  // 初回スキャン（SPAのレンダリング遅延に対応して複数回試行）
-  function initialScan() {
-    document.querySelectorAll('[aria-label="リアクションを追加"]').forEach(injectTranslateButton);
-    document.querySelectorAll('form').forEach(f => injectComposeTranslateButton(f));
-    if (window.location.pathname.startsWith('/settings')) injectKtSettings();
-  }
-
-  initialScan();
-  setTimeout(initialScan, 500);
-  setTimeout(initialScan, 1500);
-
   // ===== /settings ページ統合 =====
 
   let _ktActive = false;
-
-  function injectKtSettings() {
-    injectKtSettingsNavItem();
-    injectKtSettingsMobileNavItem();
-  }
-
   let _ktMobNavObserver = null;
 
   function _findMobileNav() {
@@ -912,6 +895,22 @@ ${text}`;
     'イタリア語', 'ポルトガル語', 'ロシア語', 'アラビア語',
     'ヒンディー語', 'タイ語', 'ベトナム語', 'インドネシア語',
   ];
+
+  function injectKtSettings() {
+    injectKtSettingsNavItem();
+    injectKtSettingsMobileNavItem();
+  }
+
+  // 初回スキャン（SPAのレンダリング遅延に対応して複数回試行）
+  function initialScan() {
+    document.querySelectorAll('[aria-label="リアクションを追加"]').forEach(injectTranslateButton);
+    document.querySelectorAll('form').forEach(f => injectComposeTranslateButton(f));
+    if (window.location.pathname.startsWith('/settings')) injectKtSettings();
+  }
+
+  initialScan();
+  setTimeout(initialScan, 500);
+  setTimeout(initialScan, 1500);
 
   function injectKtSettingsNavItem() {
     if (!window.location.pathname.startsWith('/settings')) return;
