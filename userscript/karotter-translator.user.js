@@ -1,10 +1,12 @@
 // ==UserScript==
 // @name         Karotter Translator
 // @namespace    https://karotter.com/
-// @version      1.2.0
+// @version      1.2.1
 // @description  karotter.comの投稿をLLMで翻訳するユーザースクリプト
 // @author       kav0tter
 // @match        https://karotter.com/*
+// @match        https://karotter.jp/*
+// @match        https://karotter.karon.jp/*
 // @grant        GM_getValue
 // @grant        GM_setValue
 // @grant        GM_xmlhttpRequest
@@ -343,7 +345,7 @@
     const language = getSetting('language', '日本語');
 
     if (!baseUrl || !apiKey) {
-      throw new Error('設定が未完了です。karotter.com/settings の「Karotter Translator」から設定を行ってください。');
+      throw new Error('設定が未完了です。設定ページの「Karotter Translator」から設定を行ってください。');
     }
 
     const target = targetLanguage || language || '日本語';

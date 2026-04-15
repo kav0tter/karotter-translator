@@ -6,6 +6,8 @@
   "permissions": ["storage", "sidePanel"],
   "host_permissions": [
     "https://karotter.com/*",
+    "https://karotter.jp/*",
+    "https://karotter.karon.jp/*",
     "https://*/*"
   ],
   "side_panel": {
@@ -23,7 +25,11 @@
   },
   "content_scripts": [
     {
-      "matches": ["https://karotter.com/*"],
+      "matches": [
+        "https://karotter.com/*",
+        "https://karotter.jp/*",
+        "https://karotter.karon.jp/*"
+      ],
       "js": ["content.js"],
       "css": ["content.css"],
       "run_at": "document_idle"
