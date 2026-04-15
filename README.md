@@ -1,6 +1,6 @@
 # Karotter Translator
 
-![version](https://img.shields.io/badge/version-1.0.0-blue?style=flat-square)
+![version](https://img.shields.io/badge/version-1.1.6-blue?style=flat-square)
 ![manifest](https://img.shields.io/badge/manifest-v3-brightgreen?style=flat-square)
 ![license](https://img.shields.io/github/license/kav0tter/karotter-translator?style=flat-square)
 ![Chrome](https://img.shields.io/badge/Chrome-Extension-yellow?style=flat-square&logo=googlechrome&logoColor=white)
@@ -82,10 +82,11 @@ git clone https://github.com/kav0tter/karotter-translator.git
 
 ### Userscript（Firefox / Safari / Chrome）
 
-Firefox・Safari・その他のブラウザでも Userscript として動作します。自動更新に対応しているため、一度インストールすれば以降は手動更新不要です。
+Firefox・Safari・Chrome（Tampermonkey経由）など主要ブラウザで動作します。自動更新に対応しているため、一度インストールすれば以降は手動更新不要です。
 
 | ブラウザ | 推奨マネージャー |
 |---|---|
+| Chrome | [Tampermonkey](https://chromewebstore.google.com/detail/tampermonkey/dhdgffkkebhmkfjojejmpbldmpobfkfo) |
 | Firefox | [Tampermonkey](https://addons.mozilla.org/ja/firefox/addon/tampermonkey/) / [Violentmonkey](https://addons.mozilla.org/ja/firefox/addon/violentmonkey/) |
 | Safari | [Userscripts](https://apps.apple.com/jp/app/userscripts/id1463298887) |
 
@@ -99,7 +100,7 @@ https://raw.githubusercontent.com/kav0tter/karotter-translator/master/karotter-t
 
 ## セットアップ
 
-設定は **karotter.com の設定ページ**（[karotter.com/settings](https://karotter.com/settings)）の「Karotter Translator」から行います。Chrome拡張機能はサイドパネルからも設定できます。
+設定は **karotter.com の設定ページ**（[karotter.com/settings](https://karotter.com/settings)）の「Karotter Translator」から行います。モバイル・PC どちらの画面サイズでも設定できます。
 
 ### API設定（保存ボタンで確定）
 
