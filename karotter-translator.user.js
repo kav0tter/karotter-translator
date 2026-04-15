@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Karotter Translator
 // @namespace    https://karotter.com/
-// @version      1.1.8
+// @version      1.1.9
 // @description  karotter.comの投稿をLLMで翻訳するユーザースクリプト
 // @author       kav0tter
 // @match        https://karotter.com/*
@@ -147,7 +147,14 @@
     }
 
   `;
-  (document.head || document.documentElement).appendChild(_style);
+  function _ktInjectStyle() {
+    (document.head || document.documentElement).appendChild(_style);
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', _ktInjectStyle, { once: true });
+  } else {
+    _ktInjectStyle();
+  }
 
   // ===== 設定ストレージ =====
 
