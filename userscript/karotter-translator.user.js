@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Karotter Translator
 // @namespace    https://karotter.com/
-// @version      1.3.0
+// @version      1.3.1
 // @description  karotter.comの投稿をLLMで翻訳するユーザースクリプト
 // @author       kav0tter
 // @match        https://karotter.com/*
@@ -139,7 +139,15 @@
     return (navigator.language || 'ja').startsWith('ja') ? 'ja' : 'en';
   }
 
-  let _locale = _getLocale(GM_getValue('uiLanguage', 'auto'));
+  // GM_getValue はSafariの実装では非同期(Promise)を返す場合があるため
+  // 同期的に取得できた場合のみ使用し、それ以外はnavigator.languageにフォールバック
+  let _locale;
+  try {
+    const _stored = GM_getValue('uiLanguage', 'auto');
+    _locale = (_stored instanceof Promise) ? _getLocale('auto') : _getLocale(_stored);
+  } catch {
+    _locale = _getLocale('auto');
+  }
   function _t(key, sub) {
     let msg = _messages[_locale]?.[key] ?? _messages.ja[key] ?? key;
     if (sub !== undefined) msg = msg.replace('$1', sub);
