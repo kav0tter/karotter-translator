@@ -81,11 +81,4 @@ https://raw.githubusercontent.com/kav0tter/karotter-translator/master/userscript
 
 ---
 
-## Roadmap
-
-- [ ] Chrome Web Store公開
-- [ ] Firefox Add-ons公開（拡張機能版）
-
----
-
 developed by [@v0](https://karotter.com/profile/v0)
