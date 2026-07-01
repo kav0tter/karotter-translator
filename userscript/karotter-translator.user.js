@@ -545,9 +545,8 @@ ${text}`;
             { role: 'system', content: systemPrompt },
             { role: 'user', content: userPrompt },
           ],
-          temperature: 0.3,
-          max_tokens: 300,
-        };
+        temperature: 0.3,
+      };
 
     if (debug) {
       console.log('[KT] APIリクエスト ─────────────────');
