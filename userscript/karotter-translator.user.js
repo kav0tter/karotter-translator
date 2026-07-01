@@ -376,7 +376,7 @@
   // ===== 投稿コンテナの特定 =====
 
   function getPostContainer(reactionBtn) {
-    return reactionBtn?.parentElement?.parentElement?.parentElement;
+    return reactionBtn?.closest('.flex-1');
   }
 
   // ===== スレッドコンテキスト取得 =====
@@ -384,25 +384,14 @@
   function extractPostData(reactionBtn) {
     const container = getPostContainer(reactionBtn);
     if (!container) return null;
-    const textEl = container.querySelector('p.whitespace-pre-wrap');
-    const header = textEl ? getPreviousSiblings(textEl, container) : container;
-    const displayName = (header || container)
+    const displayName = container
       .querySelector?.('a[href*="/profile/"]')?.textContent?.trim();
-    const handle = [...((header || container).querySelectorAll?.('span') || [])]
+    const handle = [...(container.querySelectorAll?.('span') || [])]
       .find(s => /^@\w+$/.test(s.textContent.trim()))?.textContent?.trim();
+    const textEl = container.querySelector('.karotter-rich-text p');
     const text = textEl?.textContent?.trim();
     if (!text) return null;
     return { displayName: displayName || handle || '不明', handle: handle || '', text };
-  }
-
-  function getPreviousSiblings(el, parent) {
-    const wrapper = document.createElement('div');
-    let node = parent.firstChild;
-    while (node && node !== el) {
-      wrapper.appendChild(node.cloneNode(true));
-      node = node.nextSibling;
-    }
-    return wrapper;
   }
 
   function extractReplyTarget(form) {
@@ -411,19 +400,19 @@
     const displayName = el.querySelector('span.truncate.font-semibold')?.textContent?.trim();
     const handle = [...el.querySelectorAll('span')]
       .find(s => /^@\w+$/.test(s.textContent.trim()))?.textContent?.trim();
-    const text = el.querySelector('p.whitespace-pre-wrap')?.textContent?.trim();
+    const text = el.querySelector('.karotter-rich-text p')?.textContent?.trim();
     if (!text) return null;
     return { displayName: displayName || handle || '不明', handle: handle || '', text };
   }
 
   function extractQuotedPost(container) {
     const quoteEl = [...container.querySelectorAll('[class*="rounded-2xl"]')]
-      .find(el => el.className.includes('border') && el.querySelector('p.whitespace-pre-wrap'));
+      .find(el => el.className.includes('border') && el.querySelector('.karotter-rich-text p'));
     if (!quoteEl) return null;
     const displayName = quoteEl.querySelector('a[href*="/profile/"]')?.textContent?.trim();
     const handle = [...quoteEl.querySelectorAll('span')]
       .find(s => /^@\w+$/.test(s.textContent.trim()))?.textContent?.trim();
-    const text = quoteEl.querySelector('p.whitespace-pre-wrap')?.textContent?.trim();
+    const text = quoteEl.querySelector('.karotter-rich-text p')?.textContent?.trim();
     if (!text) return null;
     return { displayName: displayName || handle || '不明', handle: handle || '', text, type: 'quote' };
   }
@@ -628,7 +617,7 @@ ${text}`;
     if (!container || container.hasAttribute(PROCESSED_ATTR)) return;
     container.setAttribute(PROCESSED_ATTR, '1');
 
-    const textEl = container.querySelector('p.whitespace-pre-wrap');
+    const textEl = container.querySelector('.karotter-rich-text p');
     if (!textEl) return;
 
     const btnRow = document.createElement('div');
@@ -640,7 +629,8 @@ ${text}`;
     btn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m5 8 6 6"/><path d="m4 14 6-6 2-3"/><path d="M2 5h12"/><path d="M7 2h1"/><path d="m22 22-5-10-5 10"/><path d="M14 18h6"/></svg><span class="kt-btn-label">${_t('translateBtn')}</span>`;
 
     btnRow.appendChild(btn);
-    textEl.insertAdjacentElement('beforebegin', btnRow);
+    const richText = textEl.closest('.karotter-rich-text') || textEl.parentElement;
+    richText.insertAdjacentElement('beforebegin', btnRow);
 
     if (autoTranslateEnabled) enqueueAutoTranslate(btn);
 
